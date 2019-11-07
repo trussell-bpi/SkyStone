@@ -48,16 +48,20 @@ public class HolonomicGyro extends LinearOpMode {
             robot.setClaw(gamepad1.b);
             robot.setSpeed(gamepad1.left_bumper, gamepad1.right_bumper);
 
+            double angle = robot.getAngle();
+            if(angle < 0)
+                angle += 360;
+
             //robot drive
-            double coords[] = robot.returnOffsetAngle(LX, LY, robot.getAngle());
+            double coords[] = robot.returnOffsetAngle(LX, LY, angle);
             LX = coords[0];
             LY = coords[1];
 
             robot.drive(LX,LY,-RX);
 
             telemetry.addData("Drive", "Holonomic");
-            telemetry.addData("Global Heading", robot.getAngle());
-            telemetry.addData("speed", "%.2f", robot.speed);
+            telemetry.addData("Global Heading", angle);
+            telemetry.addData("speed", robot.speed);
             telemetry.update();
         }
     }

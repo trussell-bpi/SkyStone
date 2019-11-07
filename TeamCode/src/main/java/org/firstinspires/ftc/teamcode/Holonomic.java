@@ -32,27 +32,25 @@ public class Holonomic extends LinearOpMode {
 
         robot.initMotors(hardwareMap);
         robot.initServos(hardwareMap);
-        robot.initIMU(hardwareMap);
-        robot.useEncoders(false);
+        //robot.initIMU(hardwareMap);
+        robot.useEncoders(false);//don't need encoders for teleop
 
         waitForStart();
         runtime.reset();
 
         while (opModeIsActive()) {
             //forks
-             robot.setForks(gamepad1.a);
-             robot.setClaw(gamepad1.b);
+             robot.setForks(gamepad1.a);//pressing a changes fork position, up to down, or vice versa
+             robot.setClaw(gamepad1.b);//pressing a changes claw position, up to down, or vice versa
              robot.setSpeed(gamepad1.left_bumper, gamepad1.right_bumper);
-
-            //robot drive
 
             robot.drive(gamepad1.left_stick_x,
                         gamepad1.left_stick_y,
                         -gamepad1.right_stick_x);
 
             telemetry.addData("Drive", "Holonomic");
-            telemetry.addData("Global Heading", robot.getAngle());
-            telemetry.addData("speed", "%.2f", robot.speed);
+            //telemetry.addData("Global Heading", robot.getAngle());
+            telemetry.addData("speed", robot.speed);
             telemetry.update();
         }
     }

@@ -24,7 +24,7 @@ public class Robot3939 {
     double  globalAngle;//robot angle
 
     public double FLpower, FRpower, RLpower, RRpower;//power of the motors
-    public double speed = 10;
+    public double speed = 10.0;
 
     private static final double deadZone = 0.10;
     public static final boolean earthIsFlat = true;
@@ -103,7 +103,7 @@ public class Robot3939 {
             RTheld = false;
         }
 
-        speed = Range.clip(speed, -1, 1);
+        speed = Range.clip(speed, 0, 10);
     }
 
     public void setAllGivenPower(double power) {
@@ -122,29 +122,32 @@ public class Robot3939 {
     public static double[] returnOffsetAngle(double x, double y, double offset) {//offset = imu
         double stickAngle = returnAngle(x, y);
         double offsetAngle = stickAngle - offset;
-        double[] offsettedPoint = calculateOffset(Math.toRadians(offsetAngle));
+
+        if(offsetAngle < 0)//get rid of negative angle
+            offsetAngle += 360;
+
+        double[] offsettedPoint = calculateOffset(toRadians(offsetAngle));
         return offsettedPoint;
     }
 
     //Returns the angle in degrees from the origin to the specified point
     public static double returnAngle(double x, double y) {
-        double[] angleDirection = new double[2];
-        angleDirection[0] = x - 0;
-        angleDirection[1] = y - 0;
-        double angle =  Math.toDegrees(Math.atan2(angleDirection[1], angleDirection[0]));
-        return angle;
+//        double[] angleDirection = new double[2];
+//        angleDirection[0] = x - 0;
+//        angleDirection[1] = y - 0;
+        return toDegrees(atan2(y, x));
     }
     //Returns a vector double array containing the offset point
     public static double[] calculateOffset(double degrees) {
         double[] offsetPoint = new double[2];
-        offsetPoint[0] = Math.cos(degrees);
-        offsetPoint[1] = Math.sin(degrees);
+        offsetPoint[0] = cos(degrees);
+        offsetPoint[1] = sin(degrees);
         return offsetPoint;
     }
 
 
     public void drive(double LX, double LY, double rotate) {
-        if((Math.abs(LX) > deadZone) || (Math.abs(LY) > deadZone) || (Math.abs(rotate) > deadZone)) {
+        if((abs(LX) > deadZone) || (abs(LY) > deadZone) || (abs(rotate) > deadZone)) {
             FLpower = LY - LX + rotate;
             FRpower = LY + LX - rotate;
             RRpower = LY - LX - rotate;
@@ -157,21 +160,21 @@ public class Robot3939 {
         }
 
         //get max power out of all 4 powers
-        double maxPower = Math.max(1.0, Math.max(Math.max(Math.abs(FLpower), Math.abs(RLpower)), Math.max(Math.abs(FRpower), Math.abs(RRpower))));
+        double maxPower = max(1.0, max(max(abs(FLpower), abs(RLpower)), max(abs(FRpower), abs(RRpower))));
 
-        //if any of them is greater than 1, it will slow down all by the same ratio
+        //if any of them is greater than 1, it will slow down all by the same ratio, for smoother control
         if(maxPower > 1.0) {
             FLpower /= maxPower;
             FRpower /= maxPower;
             RLpower /= maxPower;
             RRpower /= maxPower;
         }
-        double reduction = 312.0/435.0;
-
-        FL.setPower(reduction*FLpower*speed/10);
-        FR.setPower(reduction*FRpower*speed/10);
-        RL.setPower(reduction*RLpower*speed/10);
-        RR.setPower(RRpower*speed/10);
+        double reduction = 312.0/435.0;//front wheels are 435 rpm, back wheels are 312 rpm
+        // so we have to decrease their speed to match that of the rear wheels.
+        FL.setPower(reduction*FLpower*speed/10.0);
+        FR.setPower(reduction*FRpower*speed/10.0);
+        RL.setPower(RLpower*speed/10.0);
+        RR.setPower(RRpower*speed/10.0);
     }
 
     //for autonomous, use only one axis at a time for now. still under development
@@ -208,7 +211,7 @@ public class Robot3939 {
         RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        setAllGivenPower(Math.abs(power));
+        setAllGivenPower(abs(power));
 
         stopMotors();
 
