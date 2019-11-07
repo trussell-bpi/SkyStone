@@ -26,7 +26,7 @@ public class Robot3939 {
     public double FLpower, FRpower, RLpower, RRpower;//power of the motors
     public double speed = 10.0;
 
-    private static final double deadZone = 0.10;
+    public static final double deadZone = 0.10;
     public static final boolean earthIsFlat = true;
 
     private final int encoderTicks = 1120;
@@ -126,7 +126,7 @@ public class Robot3939 {
         if(offsetAngle < 0)//get rid of negative angle
             offsetAngle += 360;
 
-        double[] offsettedPoint = calculateOffset(Math.toRadians(offsetAngle));
+        double[] offsettedPoint = calculateOffset(Math.toRadians(offsetAngle), getHypotenuse(x, y));
         return offsettedPoint;
     }
 
@@ -138,11 +138,15 @@ public class Robot3939 {
         return Math.toDegrees(Math.atan2(angleDirection[1], angleDirection[0]));
     }
     //Returns a vector double array containing the offset point
-    public static double[] calculateOffset(double degrees) {
+    public static double[] calculateOffset(double degrees, double h) {
         double[] offsetPoint = new double[2];
-        offsetPoint[0] = Math.cos(degrees);
-        offsetPoint[1] = Math.sin(degrees);
+        offsetPoint[0] = h*Math.cos(degrees);
+        offsetPoint[1] = h*Math.sin(degrees);
         return offsetPoint;
+    }
+
+    public static double getHypotenuse(double x, double y) {
+        return sqrt(x*x + y*y);
     }
 
 

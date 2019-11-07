@@ -27,6 +27,7 @@ public class HolonomicGyro extends LinearOpMode {
 
     public static final boolean earthIsFlat = true;
 
+
     @Override //when init is pressed
     public void runOpMode(){
 
@@ -60,7 +61,12 @@ public class HolonomicGyro extends LinearOpMode {
             LX = coords[0];
             LY = coords[1];
 
-            robot.drive(LX,LY,-RX);
+            if(LX > robot.deadZone && LY > robot.deadZone) {
+                robot.drive(LX,LY,-RX);
+            }
+            else
+                robot.stopMotors();
+
 
             telemetry.addData("Drive", "Holonomic");
             telemetry.addData("Global Heading", angle);
