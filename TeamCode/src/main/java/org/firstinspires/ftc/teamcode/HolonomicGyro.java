@@ -14,7 +14,7 @@ import pkg3939.Robot3939;
  * Created by maryjane on 11/6/2018.
  * after 1st meet
  * mecanum wheels
- * yes
+ * Hi, edit
  */
 
 @TeleOp(name="HolonomicGyro", group="Iterative Opmode")
@@ -22,6 +22,7 @@ import pkg3939.Robot3939;
 public class HolonomicGyro extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
+    //Declaration of the motors and servos goes here
     Robot3939 robot = new Robot3939();
 
     public static final boolean earthIsFlat = true;
@@ -39,40 +40,25 @@ public class HolonomicGyro extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        double speedSet = 5;//robot starts with speed 5 due to 40 ratio motors being op
-        double reduction = 7.5;//fine rotation for precise  stacking. higher value = slower rotation using triggers
-
         while (opModeIsActive()) {
-            double LX = -gamepad1.left_stick_x, LY = gamepad1.left_stick_y, rotate = gamepad1.right_stick_x;
+            double LX = gamepad1.left_stick_x, LY = gamepad1.left_stick_y, RX = gamepad1.right_stick_x;
 
+            //forks
             robot.setForks(gamepad1.a);
             robot.setClaw(gamepad1.b);
+            robot.setSpeed(gamepad1.left_bumper, gamepad1.right_bumper);
 
-            //bumpers set speed of robot
-            if(gamepad1.right_bumper)
-                speedSet += 0.0005;
-            else if(gamepad1.left_bumper)
-                speedSet -= 0.0005;
+            //robot drive
+            double coords[] = robot.returnOffsetAngle(LX, LY, robot.getAngle());
+            LX = coords[0];
+            LY = coords[1];
 
-            speedSet =  Range.clip(speedSet, 1, 10);//makes sure speed is limited at 10.
-
-            if(!gamepad1.right_bumper && !gamepad1.left_bumper)//makes sure speed does not round every refresh. otherwise, speed won't be able to change
-                speedSet = Math.round(speedSet);
-
-            //Holonomic Vector Math
-            double driveAngle = robot.CompToDegrees(LX, LY);
-            double correctedAngle = driveAngle - robot.getAngle();
-            double power = robot.CompToHypotenuse(LX, LY);
-            robot.driveAngle(correctedAngle, power, rotate);
+            robot.drive(LX,LY,-RX);
 
             telemetry.addData("Drive", "Holonomic");
-
-            telemetry.addData("speedSet", "%.2f", speedSet);
+            telemetry.addData("Global Heading", robot.getAngle());
+            telemetry.addData("speed", "%.2f", robot.speed);
             telemetry.update();
         }
-    }
-
-    public void processAngle() {
-
     }
 }

@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -23,10 +24,10 @@ public class Robot3939 {
     double  globalAngle;//robot angle
 
     public double FLpower, FRpower, RLpower, RRpower;//power of the motors
+    public double speed = 10;
 
     private static final double deadZone = 0.10;
     public static final boolean earthIsFlat = true;
-    final double reduction = 5;//fine rotation for precise stacking. higher value = slower rotation using triggers
 
     private final int encoderTicks = 1120;
     private final double wheelDiameter = 3.85827;//in inches
@@ -37,10 +38,10 @@ public class Robot3939 {
         FL       = hwmap.dcMotor.get("front_left");
         FR      = hwmap.dcMotor.get("front_right");
 
-        RL.setDirection(DcMotorSimple.Direction.REVERSE);
-        FL.setDirection(DcMotorSimple.Direction.REVERSE);
-        RR.setDirection(DcMotorSimple.Direction.FORWARD);
-        FR.setDirection(DcMotorSimple.Direction.FORWARD);
+        RL.setDirection(DcMotorSimple.Direction.FORWARD);
+        FL.setDirection(DcMotorSimple.Direction.FORWARD);
+        RR.setDirection(DcMotorSimple.Direction.REVERSE);
+        FR.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void setFront(HardwareMap hwmap) {
@@ -85,24 +86,24 @@ public class Robot3939 {
         }
     }
 
-    public void setFLPower(double power)
-    {
-        FL.setPower(power);
-    }
+    boolean LTheld = false;
+    boolean RTheld = false;
+    public void setSpeed(boolean LTpressed, boolean RTpressed) {
+        if(!LTheld && LTpressed) {
+            LTheld = true;
+            speed--;
+        } else if(!LTpressed) {
+            LTheld = false;
+        }
 
-    public void setRLPower(double power)
-    {
-        RL.setPower(power);
-    }
+        if(!RTheld && RTpressed) {
+            RTheld = true;
+            speed++;
+        } else if(!RTpressed) {
+            RTheld = false;
+        }
 
-    public void setFRPower(double power)
-    {
-        FR.setPower(power);
-    }
-
-    public void setRRPower(double power)
-    {
-        RR.setPower(power);
+        speed = Range.clip(speed, -1, 1);
     }
 
     public void setAllGivenPower(double power) {
@@ -118,31 +119,27 @@ public class Robot3939 {
         setAllGivenPower(0);
     }
 
-    public double CompToHypotenuse(double x, double y) {
-        return sqrt(x*x+y*y);
+    public static double[] returnOffsetAngle(double x, double y, double offset) {//offset = imu
+        double stickAngle = returnAngle(x, y);
+        double offsetAngle = stickAngle - offset;
+        double[] offsettedPoint = calculateOffset(Math.toRadians(offsetAngle));
+        return offsettedPoint;
     }
 
-    public double CompToDegrees(double x, double y) {
-        double angle = toDegrees(atan2(y, x));
-        if(angle<0)
-            angle += 360;
+    //Returns the angle in degrees from the origin to the specified point
+    public static double returnAngle(double x, double y) {
+        double[] angleDirection = new double[2];
+        angleDirection[0] = x - 0;
+        angleDirection[1] = y - 0;
+        double angle =  Math.toDegrees(Math.atan2(angleDirection[1], angleDirection[0]));
         return angle;
     }
-
-    public double[] toComp(double angle, double power) {
-        double[] comps = {0, 0};
-
-        comps[0] = power*cos(angle);
-        comps[1] = power*sin(angle);
-
-        return comps;
-    }
-
-    public void driveAngle(double angle, double power, double rotate) {
-        double[] comps = toComp(angle, power);
-        double x = comps[0], y = comps[1];
-
-        drive(x, y, rotate);
+    //Returns a vector double array containing the offset point
+    public static double[] calculateOffset(double degrees) {
+        double[] offsetPoint = new double[2];
+        offsetPoint[0] = Math.cos(degrees);
+        offsetPoint[1] = Math.sin(degrees);
+        return offsetPoint;
     }
 
 
@@ -169,10 +166,12 @@ public class Robot3939 {
             RLpower /= maxPower;
             RRpower /= maxPower;
         }
-        FL.setPower(FLpower);
-        FR.setPower(FRpower);
-        RL.setPower(RLpower);
-        RR.setPower(RRpower);
+        double reduction = 312.0/435.0;
+
+        FL.setPower(reduction*FLpower*speed/10);
+        FR.setPower(reduction*FRpower*speed/10);
+        RL.setPower(reduction*RLpower*speed/10);
+        RR.setPower(RRpower*speed/10);
     }
 
     //for autonomous, use only one axis at a time for now. still under development
