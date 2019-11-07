@@ -47,7 +47,7 @@ public class Robot3939 {
     public void setFront(HardwareMap hwmap) {
         RL.setDirection(DcMotorSimple.Direction.FORWARD);
         FL.setDirection(DcMotorSimple.Direction.FORWARD);
-        RR.setDirection(DcMotorSimple.Direction.REVERSE);
+        RR.setDirection(DcMotorSimple.Direction.FORWARD);
         FR.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
@@ -126,22 +126,22 @@ public class Robot3939 {
         if(offsetAngle < 0)//get rid of negative angle
             offsetAngle += 360;
 
-        double[] offsettedPoint = calculateOffset(toRadians(offsetAngle));
+        double[] offsettedPoint = calculateOffset(Math.toRadians(offsetAngle));
         return offsettedPoint;
     }
 
     //Returns the angle in degrees from the origin to the specified point
     public static double returnAngle(double x, double y) {
-//        double[] angleDirection = new double[2];
-//        angleDirection[0] = x - 0;
-//        angleDirection[1] = y - 0;
-        return toDegrees(atan2(y, x));
+        double[] angleDirection = new double[2];
+        angleDirection[0] = x - 0;
+        angleDirection[1] = y - 0;
+        return Math.toDegrees(Math.atan2(angleDirection[1], angleDirection[0]));
     }
     //Returns a vector double array containing the offset point
     public static double[] calculateOffset(double degrees) {
         double[] offsetPoint = new double[2];
-        offsetPoint[0] = cos(degrees);
-        offsetPoint[1] = sin(degrees);
+        offsetPoint[0] = Math.cos(degrees);
+        offsetPoint[1] = Math.sin(degrees);
         return offsetPoint;
     }
 

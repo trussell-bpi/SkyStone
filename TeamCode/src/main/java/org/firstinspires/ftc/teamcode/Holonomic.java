@@ -32,6 +32,7 @@ public class Holonomic extends LinearOpMode {
 
         robot.initMotors(hardwareMap);
         robot.initServos(hardwareMap);
+        robot.setFront(hardwareMap);
         //robot.initIMU(hardwareMap);
         robot.useEncoders(false);//don't need encoders for teleop
 
