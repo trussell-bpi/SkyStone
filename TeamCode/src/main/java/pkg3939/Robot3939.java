@@ -119,15 +119,16 @@ public class Robot3939 {
         setAllGivenPower(0);
     }
 
-    public static double[] returnOffsetAngle(double x, double y, double offset) {//offset = imu
+    public static double[] getComponents(double x, double y, double offset) {//offset = imu
         double stickAngle = returnAngle(x, y);
-        double offsetAngle = stickAngle - offset;
+        double offsetAngle = stickAngle - offset;//stick - IMU
 
         if(offsetAngle < 0)//get rid of negative angle
-            offsetAngle += 360;
-
-        double[] offsettedPoint = calculateOffset(Math.toRadians(offsetAngle), getHypotenuse(x, y));
-        return offsettedPoint;
+            offsetAngle += 360.0;
+        double[] offsetPoint = new double[2];
+        offsetPoint[0] = getHypotenuse(x, y)*Math.cos(Math.toRadians(offsetAngle));
+        offsetPoint[1] = getHypotenuse(x, y)*Math.sin(Math.toRadians(offsetAngle));
+        return offsetPoint;
     }
 
     //Returns the angle in degrees from the origin to the specified point
@@ -137,16 +138,10 @@ public class Robot3939 {
         angleDirection[1] = y - 0;
         return Math.toDegrees(Math.atan2(angleDirection[1], angleDirection[0]));
     }
-    //Returns a vector double array containing the offset point
-    public static double[] calculateOffset(double degrees, double h) {
-        double[] offsetPoint = new double[2];
-        offsetPoint[0] = h*Math.cos(degrees);
-        offsetPoint[1] = h*Math.sin(degrees);
-        return offsetPoint;
-    }
+
 
     public static double getHypotenuse(double x, double y) {
-        return sqrt(x*x + y*y);
+        return Math.sqrt(x*x + y*y);
     }
 
 

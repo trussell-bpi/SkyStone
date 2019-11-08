@@ -2,11 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import pkg3939.Robot3939;
 
@@ -49,23 +45,18 @@ public class HolonomicGyro extends LinearOpMode {
             //forks
             robot.setForks(gamepad1.a);
             robot.setClaw(gamepad1.b);
-
             robot.setSpeed(gamepad1.left_bumper, gamepad1.right_bumper);
 
             double angle = robot.getAngle();
             if(angle < 0)
-                angle += 360;
+                angle += 360.0;
 
             //robot drive
-            double coords[] = robot.returnOffsetAngle(LX, LY, angle);
-            LX = coords[0];
-            LY = coords[1];
+            double coords[] = robot.getComponents(LX, LY, angle);
+            double newLX = coords[0];
+            double newLY = coords[1];
 
-            if(LX > robot.deadZone && LY > robot.deadZone) {
-                robot.drive(LX,LY,-RX);
-            }
-            else
-                robot.stopMotors();
+            robot.drive(newLX,newLY,-RX);
 
 
             telemetry.addData("Drive", "Holonomic");
