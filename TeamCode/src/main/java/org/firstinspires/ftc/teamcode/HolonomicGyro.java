@@ -40,7 +40,7 @@ public class HolonomicGyro extends LinearOpMode {
         runtime.reset();
 
         while (opModeIsActive()) {
-            double LX = gamepad1.left_stick_x, LY = gamepad1.left_stick_y, RX = gamepad1.right_stick_x;
+            double LX = -gamepad1.left_stick_x, LY = gamepad1.left_stick_y, RX = -gamepad1.right_stick_x;
 
             //forks
             robot.setForks(gamepad1.a);
@@ -56,7 +56,7 @@ public class HolonomicGyro extends LinearOpMode {
             double newLX = coords[0];
             double newLY = coords[1];
 
-            robot.drive(newLX,newLY,-RX);
+            robot.drive(newLX,newLY,RX);
 
 
             telemetry.addData("Drive", "Holonomic");

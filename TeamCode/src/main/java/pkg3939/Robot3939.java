@@ -113,6 +113,13 @@ public class Robot3939 {
         RR.setPower(power);
     }
 
+    public void setAllPower() {
+        FL.setPower(FLpower);
+        RL.setPower(RLpower);
+        FR.setPower(FRpower);
+        RR.setPower(RRpower);
+    }
+
 
 
     public void stopMotors() {
@@ -120,7 +127,7 @@ public class Robot3939 {
     }
 
     public static double[] getComponents(double x, double y, double offset) {//offset = imu
-        double stickAngle = returnAngle(x, y);
+        double stickAngle = returnAngle(x, y);//if stick up, stickangle = 90
         double offsetAngle = stickAngle - offset;//stick - IMU
 
         if(offsetAngle < 0)//get rid of negative angle
@@ -304,21 +311,25 @@ public class Robot3939 {
      * See if we are moving in a straight line and if not return a power correction value.
      * @return Power adjustment, + is adjust left - is adjust right.
      */
-    public double checkDirection()
+    public double checkDirection(double startAngle)
     {
         // The gain value determines how sensitive the correction is to direction changes.
         // You will have to experiment with your robot to get small smooth direction changes
         // to stay on a straight line.
-        double correction, angle, gain = .10;
+        double correction, angle, gain = .15;
 
         angle = getAngle();
 
-        if (angle == 0)
-            correction = 0;             // no adjustment.
-        else
-            correction = -angle;        // reverse sign of angle for correction.
+//        if (angle == 0)
+//            correction = 0;             // no adjustment.
+//        else
+//            correction = -angle;        // reverse sign of angle for correction.
 
-        correction = correction * gain;
+        correction = angle - startAngle;
+
+        correction *= gain;
+
+        correction = Range.clip(correction, -1, 1);
 
         return correction;
     }
@@ -327,8 +338,6 @@ public class Robot3939 {
      * Rotate left or right the number of degrees. Does not support turning more than 180 degrees.
      * @param degrees Degrees to turn, + is left - is right
      */
-
-
     private void rotate(int degrees, double power)
     {
         // restart imu movement tracking.
