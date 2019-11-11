@@ -128,7 +128,7 @@ public class Robot3939 {
 
     public static double[] getComponents(double x, double y, double offset) {//offset = imu
         double stickAngle = returnAngle(x, y);//if stick up, stickangle = 90
-        double offsetAngle = stickAngle - offset;//stick - IMU
+        double offsetAngle = -stickAngle + offset;//stick - IMU
 
         if(offsetAngle < 0)//get rid of negative angle
             offsetAngle += 360.0;
@@ -311,12 +311,12 @@ public class Robot3939 {
      * See if we are moving in a straight line and if not return a power correction value.
      * @return Power adjustment, + is adjust left - is adjust right.
      */
-    public double checkDirection(double startAngle)
+    public double checkDirection(double startAngle, double power)
     {
         // The gain value determines how sensitive the correction is to direction changes.
         // You will have to experiment with your robot to get small smooth direction changes
         // to stay on a straight line.
-        double correction, angle, gain = .15;
+        double correction, angle, gain = .125 * power;
 
         angle = getAngle();
 

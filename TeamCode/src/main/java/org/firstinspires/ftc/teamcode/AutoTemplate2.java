@@ -82,7 +82,7 @@ public class AutoTemplate2 extends LinearOpMode {
         robot.initMotors(hardwareMap);
         robot.initServos(hardwareMap);//servo
         robot.setFront(hardwareMap);
-    //    robot.initIMU(hardwareMap);//gyro
+        robot.initIMU(hardwareMap);//gyro
 
         detector.setOffset(1.7f/8f, 1.2f/8f);
         detector.camSetup(hardwareMap);
@@ -113,7 +113,10 @@ public class AutoTemplate2 extends LinearOpMode {
             telemetry.addData("Values", vals[1] + "   " + vals[0] + "   " + vals[2]);
             telemetry.update();
 
-            moveDistanceEnc(0.4, 12);
+            strafeGyro(0.7, 6);
+            mySleep(5);
+            moveDistanceGyro(-0.2, 4);
+
 
             telemetry.addData("Path", "Complete");
             telemetry.update();
@@ -171,11 +174,11 @@ public class AutoTemplate2 extends LinearOpMode {
 
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < time)) {//we get on the train together
-            double correction = robot.checkDirection(startAngle);//check if someone is pushing you
-            robot.FL.setPower(-power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-            robot.FR.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-            robot.RR.setPower(-power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-            robot.RL.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+            double correction = robot.checkDirection(startAngle, Math.abs(power));//check if someone is pushing you
+            robot.FL.setPower(-power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+            robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+            robot.RR.setPower(-power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+            robot.RL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
         }
         robot.setAllGivenPower(0);//once we're at the station, forget anything happened
         mySleep(0.2);
@@ -184,17 +187,17 @@ public class AutoTemplate2 extends LinearOpMode {
 
     public void moveDistanceGyro(double power, double time) {
         double startAngle = robot.getAngle();
-        robot.FL.setPower(power);
-        robot.FR.setPower(power);
-        robot.RL.setPower(power);
-        robot.RR.setPower(power);
+        robot.FL.setPower(-power);
+        robot.FR.setPower(-power);
+        robot.RL.setPower(-power);
+        robot.RR.setPower(-power);
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < time)) {//we get on the train together
-            double correction = robot.checkDirection(startAngle);//check if someone is pushing you
-            robot.FL.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-            robot.FR.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-            robot.RR.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-            robot.RL.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+            double correction = robot.checkDirection(startAngle, Math.abs(power));//check if someone is pushing you
+            robot.FL.setPower(-power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+            robot.FR.setPower(-power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+            robot.RR.setPower(-power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+            robot.RL.setPower(-power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
             telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();
         }
