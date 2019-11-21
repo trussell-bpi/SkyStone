@@ -102,7 +102,7 @@ public class AutoTemplate2 extends LinearOpMode {
         telemetry.addData("Status", "Ready to run");
         telemetry.update();
 
-        robot.claw.setPosition(0.5);
+        robot.bar.setPosition(0.5);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();

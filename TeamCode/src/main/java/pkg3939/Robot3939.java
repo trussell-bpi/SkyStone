@@ -264,12 +264,12 @@ public class Robot3939 {
         }
     }
 
-    public void hookFoundation(boolean bPressed) {
-        if (!bHeld && bPressed) {
-            bHeld = true;
+    public void hookFoundation(boolean aPressed) {
+        if (!aHeld && aPressed) {
+            aHeld = true;
             barDown = !barDown;
-        } else if (!bPressed)
-            bHeld = false;
+        } else if (!aPressed)
+            aHeld = false;
 
         if (barDown) {//if true, set pos to down
             bar.setPosition(1);
