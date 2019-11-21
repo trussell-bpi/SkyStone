@@ -241,27 +241,40 @@ public class Robot3939 {
 //        setAllpower();
 //    }
 
-    boolean forks = false;
     boolean barDown = false;
     boolean aHeld = false;
     boolean bHeld = false;
+    boolean leftClaw = false;
+    boolean rightClaw = false;
+    boolean xHeld = false;
 
-    public void setForks(boolean aPressed) {
-        if (!aHeld && aPressed) {
-            aHeld = true;
-            forks = !forks;
-        } else if (!aPressed)
-            aHeld = false;
+    public void setLeftClaw(boolean xPressed) {
+        if (!xHeld && xPressed) {
+            xHeld = true;
+            leftClaw = !leftClaw;
+        } else if (!xPressed)
+            xHeld = false;
 
-        if (forks) {//down
+        if (leftClaw) //down
             servoLeft.setPosition(0.6);
-            servoRight.setPosition(0.4);
-        }
+
         else if(earthIsFlat)//up
-        {
             servoLeft.setPosition(0);
+
+    }
+
+    public void setRightClaw(boolean bPressed) {
+        if (!bHeld && bPressed) {
+            bHeld = true;
+            rightClaw = !rightClaw;
+        } else if (!bPressed)
+            bHeld = false;
+
+        if (rightClaw) //down
+            servoRight.setPosition(0.4);
+        else if(earthIsFlat)//up
             servoRight.setPosition(1);
-        }
+
     }
 
     public void hookFoundation(boolean aPressed) {

@@ -37,8 +37,9 @@ public class Holonomic extends LinearOpMode {
 
         while (opModeIsActive()) {
             //forks
-             robot.setForks(gamepad1.a);//pressing a changes fork position, up to down, or vice versa
-             robot.hookFoundation(gamepad1.b);//pressing a changes claw position, up to down, or vice versa
+             robot.setRightClaw(gamepad1.b);//pressing a changes fork position, up to down, or vice versa
+             robot.setLeftClaw(gamepad1.x);
+             robot.hookFoundation(gamepad1.a);//pressing a changes claw position, up to down, or vice versa
              robot.setSpeed(gamepad1.left_bumper, gamepad1.right_bumper);
 
             robot.drive(gamepad1.left_stick_x,
