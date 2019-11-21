@@ -44,7 +44,7 @@ public class HolonomicGyro extends LinearOpMode {
 
             //forks
             robot.setForks(gamepad1.a);
-            robot.setClaw(gamepad1.b);
+            robot.hookFoundation(gamepad1.b);
             robot.setSpeed(gamepad1.left_bumper, gamepad1.right_bumper);
 
             double angle = robot.getAngle();

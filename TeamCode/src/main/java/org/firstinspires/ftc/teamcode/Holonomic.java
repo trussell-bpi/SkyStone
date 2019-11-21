@@ -2,11 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import pkg3939.Robot3939;
 
@@ -42,7 +38,7 @@ public class Holonomic extends LinearOpMode {
         while (opModeIsActive()) {
             //forks
              robot.setForks(gamepad1.a);//pressing a changes fork position, up to down, or vice versa
-             robot.setClaw(gamepad1.b);//pressing a changes claw position, up to down, or vice versa
+             robot.hookFoundation(gamepad1.b);//pressing a changes claw position, up to down, or vice versa
              robot.setSpeed(gamepad1.left_bumper, gamepad1.right_bumper);
 
             robot.drive(gamepad1.left_stick_x,

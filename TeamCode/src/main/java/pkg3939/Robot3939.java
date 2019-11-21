@@ -16,8 +16,10 @@ import static java.lang.Math.*;
 
 public class Robot3939 {
 
-    public DcMotor RL, RR, FL, FR;//motors
-    public Servo servoRight, servoLeft, claw;//servo
+    public DcMotor RL, RR, FL, FR;//drive motors
+    public DcMotor leftSlides, rightSlides;//linear slide motors
+    public Servo servoRight, servoLeft;//autonomous claw servos
+    public Servo bar;//foundation mover servo
 
     public BNO055IMU imu;//gyro
     private Orientation lastAngles = new Orientation();//saves angles
@@ -39,14 +41,19 @@ public class Robot3939 {
         FR      = hwmap.dcMotor.get("front_right");
 
         RL.setDirection(DcMotorSimple.Direction.FORWARD);
-        FL.setDirection(DcMotorSimple.Direction.FORWARD);
+        FL.setDirection(DcMotorSimple.Direction.REVERSE);
         RR.setDirection(DcMotorSimple.Direction.REVERSE);
         FR.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
+    public void initLinearSlides(HardwareMap hwmap) {
+        leftSlides = hwmap.dcMotor.get("leftSlides");
+        rightSlides = hwmap.dcMotor.get("rightSlides");
+    }
+
     public void setFront(HardwareMap hwmap) {
         RL.setDirection(DcMotorSimple.Direction.FORWARD);
-        FL.setDirection(DcMotorSimple.Direction.FORWARD);
+        FL.setDirection(DcMotorSimple.Direction.REVERSE);
         RR.setDirection(DcMotorSimple.Direction.FORWARD);
         FR.setDirection(DcMotorSimple.Direction.REVERSE);
     }
@@ -54,7 +61,7 @@ public class Robot3939 {
     public void initServos(HardwareMap hwmap) {
         servoRight = hwmap.servo.get("servoRight");
         servoLeft = hwmap.servo.get("servoLeft");
-        claw = hwmap.servo.get("claw");
+        bar = hwmap.servo.get("bar");
     }
 
     public void initIMU(HardwareMap hwmap) {
@@ -235,7 +242,7 @@ public class Robot3939 {
 //    }
 
     boolean forks = false;
-    boolean clawDown = false;
+    boolean barDown = false;
     boolean aHeld = false;
     boolean bHeld = false;
 
@@ -257,19 +264,19 @@ public class Robot3939 {
         }
     }
 
-    public void setClaw(boolean bPressed) {
+    public void hookFoundation(boolean bPressed) {
         if (!bHeld && bPressed) {
             bHeld = true;
-            clawDown = !clawDown;
+            barDown = !barDown;
         } else if (!bPressed)
             bHeld = false;
 
-        if (clawDown) {//if true, set pos to down
-            claw.setPosition(1);
+        if (barDown) {//if true, set pos to down
+            bar.setPosition(1);
         }
         else if(earthIsFlat)//else, up
         {
-            claw.setPosition(0.5);
+            bar.setPosition(0.5);
         }
     }
 
