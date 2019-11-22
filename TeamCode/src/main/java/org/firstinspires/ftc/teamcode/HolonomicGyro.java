@@ -48,7 +48,7 @@ public class HolonomicGyro extends LinearOpMode {
             robot.hookFoundation(gamepad1.a);//pressing a changes claw position, up to down, or vice versa
             robot.setSpeed(gamepad1.left_bumper, gamepad1.right_bumper);
 
-            double angle = robot.getAngle() + 180;
+            double angle = robot.getAngle();
             if(angle < 0)
                 angle += 360.0;
 

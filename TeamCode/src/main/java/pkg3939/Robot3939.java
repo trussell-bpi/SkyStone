@@ -52,8 +52,8 @@ public class Robot3939 {
     }
 
     public void setFront(HardwareMap hwmap) {
-        RL.setDirection(DcMotorSimple.Direction.FORWARD);
-        FL.setDirection(DcMotorSimple.Direction.REVERSE);
+        RL.setDirection(DcMotorSimple.Direction.REVERSE);
+        FL.setDirection(DcMotorSimple.Direction.FORWARD);
         RR.setDirection(DcMotorSimple.Direction.FORWARD);
         FR.setDirection(DcMotorSimple.Direction.REVERSE);
     }
@@ -256,10 +256,10 @@ public class Robot3939 {
             xHeld = false;
 
         if (leftClaw) //down
-            servoLeft.setPosition(0.6);
+            servoLeft.setPosition(0.33);
 
         else if(earthIsFlat)//up
-            servoLeft.setPosition(0);
+            servoLeft.setPosition(0.65);
 
     }
 
@@ -271,9 +271,9 @@ public class Robot3939 {
             bHeld = false;
 
         if (rightClaw) //down
-            servoRight.setPosition(0.4);
+            servoRight.setPosition(0.33);
         else if(earthIsFlat)//up
-            servoRight.setPosition(1);
+            servoRight.setPosition(0);
 
     }
 
@@ -285,11 +285,11 @@ public class Robot3939 {
             aHeld = false;
 
         if (barDown) {//if true, set pos to down
-            bar.setPosition(1);
+            bar.setPosition(1);//joe
         }
         else if(earthIsFlat)//else, up
         {
-            bar.setPosition(0.5);
+            bar.setPosition(0);
         }
     }
 

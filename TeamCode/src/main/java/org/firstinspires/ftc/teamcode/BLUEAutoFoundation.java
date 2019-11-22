@@ -108,7 +108,7 @@ public class BLUEAutoFoundation extends LinearOpMode {
         while(opModeIsActive()) {
             robot.servoLeft.setPosition(0);//raises up
             robot.servoRight.setPosition(1);//raises up
-            robot.claw.setPosition(UP);
+            //robot.claw.setPosition(UP);
             //detector.updateVals();
             //vals = detector.getVals();
             //telemetry.addData("Values", vals[1] + "   " + vals[0] + "   " + vals[2]);

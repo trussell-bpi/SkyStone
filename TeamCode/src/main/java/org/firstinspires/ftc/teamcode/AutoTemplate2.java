@@ -115,8 +115,7 @@ public class AutoTemplate2 extends LinearOpMode {
 
             strafeGyro(0.7, 6);
             mySleep(5);
-            moveDistanceGyro(-0.2, 4);
-
+            rotateAngle(0.7, 90);
 
             telemetry.addData("Path", "Complete");
             telemetry.update();
@@ -132,6 +131,35 @@ public class AutoTemplate2 extends LinearOpMode {
         while (opModeIsActive() && (runtime.seconds() < time)) {
             telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();
+        }
+
+        // Step 4:  Stop and close the claw.
+        robot.FL.setPower(0);
+        robot.FR.setPower(0);
+        robot.RL.setPower(0);
+        robot.RR.setPower(0);
+        sleep(200);
+
+    }
+
+    public void rotateAngle(double power, double angle) {
+        if(angle < 0)
+            power = -power;
+
+
+        robot.FL.setPower(power);
+        robot.FR.setPower(-power);
+        robot.RL.setPower(power);
+        robot.RR.setPower(-power);
+        runtime.reset();
+
+        double newAngle = robot.getAngle() + angle;
+        boolean run = true;
+        double angleRange = 5;
+
+        while (opModeIsActive() && run) {
+            if(Math.abs(robot.getAngle() - newAngle) < angleRange)
+                run = false;
         }
 
         // Step 4:  Stop and close the claw.
