@@ -30,12 +30,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
 import pkg3939.Robot3939;
 import pkg3939.skystoneDetectorClass;
@@ -72,56 +69,10 @@ public class AutoTemplate2 extends LinearOpMode {
     int[] vals;
     private ElapsedTime     runtime = new ElapsedTime();
 
-    @Override
-    public void runOpMode() {
+    private final double gearRatio = 2/1;//2:1
+    private final double ticksPerRev = 537.6 * gearRatio;
+    private final double wheelCircumference = 3.1415 * robot.wheelDiameter; //pi * diameter (inches)
 
-        /*
-         * Initialize the drive system variables.
-         * The init() method of the hardware class does all the work here
-         */
-        robot.initMotors(hardwareMap);
-        robot.initServos(hardwareMap);//servo
-        robot.setFront(hardwareMap);
-        robot.initIMU(hardwareMap);//gyro
-
-        detector.setOffset(1.7f/8f, 1.2f/8f);
-        detector.camSetup(hardwareMap);
-
-        robot.useEncoders(false);
-
-//        telemetry.addData("Mode", "calibrating...");
-//        telemetry.update();
-//        while (!isStopRequested() && !robot.imu.isGyroCalibrated())
-//        {
-//            sleep(50);
-//            idle();
-//        }
-//
-//        telemetry.addData("Mode", "waiting for start");
-//        telemetry.addData("imu calib status", robot.imu.getCalibrationStatus().toString());
-        telemetry.addData("Status", "Ready to run");
-        telemetry.update();
-
-        robot.bar.setPosition(0.5);
-
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
-        while(opModeIsActive()) {
-
-            detector.updateVals();
-            vals = detector.getVals();
-            telemetry.addData("Values", vals[1] + "   " + vals[0] + "   " + vals[2]);
-            telemetry.update();
-
-            strafeGyro(0.7, 6);
-            mySleep(5);
-            rotateAngle(0.7, 90);
-
-            telemetry.addData("Path", "Complete");
-            telemetry.update();
-            break;
-        }
-    }
     public void rotate(double power, double time) {
         robot.FL.setPower(power);
         robot.FR.setPower(-power);
@@ -143,6 +94,7 @@ public class AutoTemplate2 extends LinearOpMode {
     }
 
     public void rotateAngle(double power, double angle) {
+        angle = -angle;
         if(angle < 0)
             power = -power;
 
@@ -151,11 +103,10 @@ public class AutoTemplate2 extends LinearOpMode {
         robot.FR.setPower(-power);
         robot.RL.setPower(power);
         robot.RR.setPower(-power);
-        runtime.reset();
 
         double newAngle = robot.getAngle() + angle;
         boolean run = true;
-        double angleRange = 5;
+        double angleRange = 15f;
 
         while (opModeIsActive() && run) {
             if(Math.abs(robot.getAngle() - newAngle) < angleRange)
@@ -265,56 +216,138 @@ public class AutoTemplate2 extends LinearOpMode {
 
 
     public void moveDistanceEnc(double power, double distance) {
-        robot.RL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        robot.FL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.RR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        robot.FR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.stopAndResetEncoders();
 
-        robot.RL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        robot.FL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.RR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        robot.FR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.useEncoders(true);
 
-        double distancePerRotation = 3.1415 * 4; //pi * diameter (inches)
-        double rotations = -distance/distancePerRotation; //distance / circumference (inches)
-        int encoderDrivingTarget = (int)(rotations*1120);
+        double rotations = distance/ wheelCircumference; //distance / circumference (inches)
+        int targetTicks = (int)(rotations*ticksPerRev);
 
         if(opModeIsActive()) {
-            robot.RL.setTargetPosition(encoderDrivingTarget);
-            robot.RR.setTargetPosition(encoderDrivingTarget);
-//            robot.FL.setTargetPosition(encoderDrivingTarget);
-//            robot.FR.setTargetPosition(encoderDrivingTarget);
+            robot.RL.setTargetPosition(targetTicks);
+            robot.RR.setTargetPosition(targetTicks);
+            robot.FL.setTargetPosition(targetTicks);
+            robot.FR.setTargetPosition(targetTicks);
 
             robot.RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            robot.FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            robot.FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            robot.RL.setPower(power);
-            robot.RR.setPower(power);
-//            robot.FL.setPower(power);
-//            robot.FR.setPower(power);
+            robot.setAllGivenPower(-power);
 
+            double startAngle = robot.getAngle();
 
-// || robot.FL.isBusy() || robot.FR.isBusy()
-            while(robot.RL.isBusy() || robot.RR.isBusy()) {
+            while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes working
+//                 double correction = robot.checkDirection(startAngle, Math.abs(power));//check if someone is pushing you
+//                robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.RL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
                 telemetry.addData("Path", "Driving "+distance+" inches");
                 telemetry.update();
             }
 
-            robot.RL.setPower(0);
-            robot.RR.setPower(0);
-//            robot.FR.setPower(0);
-//            robot.FL.setPower(0);
+            robot.stopMotors();
 
             telemetry.addData("Path", "Complete");
             telemetry.update();
 
-            robot.RL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//            robot.FL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.RR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//            robot.FR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.useEncoders(true);
+        }
+    }
+
+    public void strafeEnc(double power, double distance) {
+        robot.stopAndResetEncoders();
+
+        robot.useEncoders(true);
+
+        double rotations = distance/ wheelCircumference; //distance / circumference (inches)
+        int targetTicks = (int)(rotations*ticksPerRev);
+
+        if(opModeIsActive()) {
+            robot.RL.setTargetPosition(-targetTicks);
+            robot.RR.setTargetPosition(targetTicks);
+            robot.FL.setTargetPosition(targetTicks);
+            robot.FR.setTargetPosition(-targetTicks);
+
+            robot.RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            robot.setAllGivenPower(power);
+
+            double startAngle = robot.getAngle();
+
+            while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
+                //wait till motor finishes working
+//                 double correction = robot.checkDirection(startAngle, Math.abs(power));//check if someone is pushing you
+//                robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.RL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+                telemetry.addData("Path", "Driving "+distance+" inches");
+                telemetry.update();
+            }
+
+            robot.stopMotors();
+
+            telemetry.addData("Path", "Complete");
+            telemetry.update();
+
+            robot.useEncoders(true);
+        }
+    }
+
+    @Override
+    public void runOpMode() {
+        /*
+         * Initialize the drive system variables.
+         * The init() method of the hardware class does all the work here
+         */
+        robot.initMotors(hardwareMap);
+        robot.initServos(hardwareMap);//servo
+        robot.setFront(hardwareMap);
+        robot.initIMU(hardwareMap);//gyro
+
+        detector.setOffset(1.7f/8f, 1.2f/8f);
+        detector.camSetup(hardwareMap);
+
+        robot.useEncoders(false);
+
+//        telemetry.addData("Mode", "calibrating...");
+//        telemetry.update();
+//        while (!isStopRequested() && !robot.imu.isGyroCalibrated())
+//        {
+//            sleep(50);
+//            idle();
+//        }
+//
+//        telemetry.addData("Mode", "waiting for start");
+//        telemetry.addData("imu calib status", robot.imu.getCalibrationStatus().toString());
+        telemetry.addData("Status", "Ready to run");
+        telemetry.update();
+
+        robot.bar.setPosition(0.5);
+
+        // Wait for the game to start (driver presses PLAY)
+        waitForStart();
+        while(opModeIsActive()) {
+
+            detector.updateVals();
+            vals = detector.getVals();
+            telemetry.addData("Values", vals[1] + "   " + vals[0] + "   " + vals[2]);
+            telemetry.update();
+
+            moveDistanceEnc(0.5, 12);
+            mySleep(5);
+            rotateAngle(0.5, 90);
+
+            telemetry.addData("Path", "Complete");
+            telemetry.update();
+            break;
         }
     }
 }

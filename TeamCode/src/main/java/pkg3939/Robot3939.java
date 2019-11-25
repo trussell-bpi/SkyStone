@@ -32,7 +32,7 @@ public class Robot3939 {
     public static final boolean earthIsFlat = true;
 
     private final int encoderTicks = 1120;
-    private final double wheelDiameter = 3.85827;//in inches
+    public final double wheelDiameter = 3.85827;//in inches
 
     public void initMotors(HardwareMap hwmap) {
         RL        = hwmap.dcMotor.get("left_drive");
@@ -91,6 +91,13 @@ public class Robot3939 {
             RR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             FR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
+    }
+
+    public void stopAndResetEncoders() {
+        RL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        RR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     boolean LTheld = false;
@@ -184,8 +191,8 @@ public class Robot3939 {
         }
         double reduction = 312.0/435.0;//front wheels are 435 rpm, back wheels are 312 rpm
         // so we have to decrease their speed to match that of the rear wheels.
-        FL.setPower(reduction*FLpower*speed/10.0);
-        FR.setPower(reduction*FRpower*speed/10.0);
+        FL.setPower(FLpower*speed/10.0);
+        FR.setPower(FRpower*speed/10.0);
         RL.setPower(RLpower*speed/10.0);
         RR.setPower(RRpower*speed/10.0);
     }
@@ -256,10 +263,10 @@ public class Robot3939 {
             xHeld = false;
 
         if (leftClaw) //down
-            servoLeft.setPosition(0.33);
+            servoLeft.setPosition(0.32);
 
         else if(earthIsFlat)//up
-            servoLeft.setPosition(0.65);
+            servoLeft.setPosition(0.66);
 
     }
 
@@ -271,7 +278,7 @@ public class Robot3939 {
             bHeld = false;
 
         if (rightClaw) //down
-            servoRight.setPosition(0.33);
+            servoRight.setPosition(0.34);
         else if(earthIsFlat)//up
             servoRight.setPosition(0);
 
