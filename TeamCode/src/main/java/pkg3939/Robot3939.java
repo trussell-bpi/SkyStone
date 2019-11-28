@@ -30,7 +30,7 @@ public class Robot3939 {
     public double FLpower, FRpower, RLpower, RRpower;//power of the motors
     public double speed = 10.0;
 
-    public static final double deadZone = 0.10;
+    public static final double minSpeed = 0.10;
     public static final boolean earthIsFlat = true;
 
     private final double encoderTicks = 537.6;
@@ -191,7 +191,7 @@ public class Robot3939 {
 
 
     public void drive(double LX, double LY, double rotate) {
-        if((abs(LX) > deadZone) || (abs(LY) > deadZone) || (abs(rotate) > deadZone)) {
+        if((abs(LX) > minSpeed) || (abs(LY) > minSpeed) || (abs(rotate) > minSpeed)) {
             FLpower = LY - LX + rotate;
             FRpower = LY + LX - rotate;
             RRpower = LY - LX - rotate;
@@ -263,7 +263,7 @@ public class Robot3939 {
     }
 
 //    public void fineTurn(double LT, double RT) {
-//        if(LT > deadZone || RT > deadZone){//we don't have to worry about Range.clip here because the abs values will never exceed 1
+//        if(LT > minSpeed || RT > minSpeed){//we don't have to worry about Range.clip here because the abs values will never exceed 1
 //            FLpower = (-LT + RT)/reduction;
 //            FRpower = (LT - RT)/reduction;
 //            RRpower = (LT - RT)/reduction;

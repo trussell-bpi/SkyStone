@@ -96,7 +96,7 @@ public class AutoTemplate2 extends LinearOpMode {
 
     public void runToAngle(double targetAngle, double threshold) {
         double angleDifference = targetAngle - robot.getAngle();
-        double power = Range.clip(0.01*Math.abs(angleDifference) + 0.1, -1, 1);
+        double power = Range.clip(0.02*Math.abs(angleDifference) + 0.1, -1, 1);
 
         if(angleDifference < 0)
             power = -power;
@@ -113,7 +113,7 @@ public class AutoTemplate2 extends LinearOpMode {
         runtime.reset();
         while (opModeIsActive() && run) {
             angleDifference = targetAngle - robot.getAngle();
-            power = Range.clip(0.01*Math.abs(angleDifference) + 0.1, -1, 1);
+            power = Range.clip(0.02*Math.abs(angleDifference) + 0.1, -1, 1);
             if(angleDifference < 0)
                 power = -power;
 
@@ -269,6 +269,70 @@ public class AutoTemplate2 extends LinearOpMode {
     }
 
 
+    public void moveEncoderDifferential(double distance) {
+        double k = 0.0004;
+
+        robot.stopAndResetEncoders();
+
+        robot.useEncoders(true);
+
+        double rotations = distance/ wheelCircumference; //distance / circumference (inches)
+        int targetTicks = (int)(rotations*ticksPerRev);
+
+        double tickAvg = (int)((robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4);
+        double tickDifference = targetTicks - tickAvg;
+        double power = Range.clip(k*Math.abs(tickDifference) + 0.1, 0.1, 1);
+
+        if(tickDifference < 0)
+            power = -power;
+
+        if(opModeIsActive()) {
+            robot.RL.setTargetPosition(targetTicks);
+            robot.RR.setTargetPosition(targetTicks);
+            robot.FL.setTargetPosition(targetTicks);
+            robot.FR.setTargetPosition(targetTicks);
+
+            robot.RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            robot.setAllGivenPower(power);
+
+            double startAngle = robot.getAngle();
+
+            while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
+                //wait till motor finishes
+
+                tickAvg = (int)((robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4.0);
+                tickDifference = targetTicks - tickAvg;
+                power = Range.clip(k*Math.abs(tickDifference) + 0.1, 0.1, 1);
+
+                if(tickDifference < 0)
+                    power = -power;
+//                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
+//                robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.RL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+
+                robot.setAllGivenPower(power);
+
+                telemetry.addData("Path", "Driving "+distance+" inches");
+                telemetry.addData("tickDifference", tickDifference);
+                telemetry.addData("power", power);
+                telemetry.update();
+            }
+
+            robot.stopMotors();
+
+            telemetry.addData("Path", "Complete");
+            telemetry.update();
+
+            robot.useEncoders(true);
+        }
+    }
+
     public void moveDistanceEnc(double power, double distance) {
         robot.stopAndResetEncoders();
 
@@ -276,6 +340,8 @@ public class AutoTemplate2 extends LinearOpMode {
 
         double rotations = distance/ wheelCircumference; //distance / circumference (inches)
         int targetTicks = (int)(rotations*ticksPerRev);
+
+
 
         if(opModeIsActive()) {
             robot.RL.setTargetPosition(targetTicks);
@@ -294,7 +360,7 @@ public class AutoTemplate2 extends LinearOpMode {
 
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes working
-                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
+                double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
                 robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
                 robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
                 robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
@@ -311,6 +377,7 @@ public class AutoTemplate2 extends LinearOpMode {
             robot.useEncoders(true);
         }
     }
+
 
     public void strafeEnc(double power, double distance) {
         robot.stopAndResetEncoders();
@@ -397,9 +464,14 @@ public class AutoTemplate2 extends LinearOpMode {
 //            strafeEnc(0.5, 24);
 //            mySleep(5);
 //            strafeEnc(0.5, -24);
-            double oldAngle = robot.getAngle();
-//            rotateAngle(0.5, 90, 15);
-            runToAngle(oldAngle - 90, 7);
+//            double oldAngle = robot.getAngle();
+////            rotateAngle(0.5, 90, 15);
+//            runToAngle(oldAngle - 90, 7);
+            moveEncoderDifferential(48);
+            runToAngle(robot.getAngle()-90, 7);
+            mySleep(1);
+            runToAngle(robot.getAngle()-90, 7);
+            moveEncoderDifferential(48);
 
 
 //            moveDistanceEnc(0.5, 24);
