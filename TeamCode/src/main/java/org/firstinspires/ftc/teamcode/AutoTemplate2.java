@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import pkg3939.Robot3939;
 import pkg3939.skystoneDetectorClass;
@@ -95,7 +96,7 @@ public class AutoTemplate2 extends LinearOpMode {
 
     public void runToAngle(double targetAngle, double threshold) {
         double angleDifference = targetAngle - robot.getAngle();
-        double power = 0.01*Math.abs(angleDifference) + 0.1;
+        double power = Range.clip(0.01*Math.abs(angleDifference) + 0.1, -1, 1);
 
         if(angleDifference < 0)
             power = -power;
@@ -111,12 +112,21 @@ public class AutoTemplate2 extends LinearOpMode {
 
         runtime.reset();
         while (opModeIsActive() && run) {
+            angleDifference = targetAngle - robot.getAngle();
+            power = Range.clip(0.01*Math.abs(angleDifference) + 0.1, -1, 1);
+            if(angleDifference < 0)
+                power = -power;
+
+            robot.FL.setPower(power);
+            robot.FR.setPower(-power);
+            robot.RL.setPower(power);
+            robot.RR.setPower(-power);
             telemetry.addData("angle difference", angleDifference);
             telemetry.addData("power", robot.FL.getPower());
             telemetry.update();
             if(Math.abs(robot.getAngle() - targetAngle) < threshold)
                 run = false;
-            if(runtime.seconds() > 4)
+            if(runtime.seconds() > 2)
                 run = false;
         }
 
@@ -388,8 +398,8 @@ public class AutoTemplate2 extends LinearOpMode {
 //            mySleep(5);
 //            strafeEnc(0.5, -24);
             double oldAngle = robot.getAngle();
-            rotateAngle(0.5, 90, 15);
-            runToAngle(oldAngle + 90, 7);
+//            rotateAngle(0.5, 90, 15);
+            runToAngle(oldAngle - 90, 7);
 
 
 //            moveDistanceEnc(0.5, 24);
