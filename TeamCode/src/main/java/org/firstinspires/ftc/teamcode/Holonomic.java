@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import pkg3939.Robot3939;
@@ -23,6 +24,50 @@ public class Holonomic extends LinearOpMode {
 
     public static final boolean earthIsFlat = true;
 
+    public void moveSlides(int constant) {
+        if(opModeIsActive()) {
+            robot.leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            robot.leftSlides.setTargetPosition(robot.leftSlides.getCurrentPosition() + constant);
+            robot.rightSlides.setTargetPosition(robot.rightSlides.getCurrentPosition() + constant);
+
+            robot.leftSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            robot.leftSlides.setPower(1);
+            robot.rightSlides.setPower(1);
+
+            runtime.reset();
+
+            while(robot.leftSlides.isBusy() || robot.rightSlides.isBusy()) {
+                //wait till motor finishes working
+                robot.drive(gamepad1.left_stick_x,
+                        gamepad1.left_stick_y,
+                        gamepad1.right_stick_x);
+                telemetry.addLine("Slides Extending");
+                telemetry.update();
+                if(runtime.seconds() > 1.2 )
+                    break;
+            }
+            telemetry.addLine("Extended");
+            telemetry.update();
+
+            robot.leftSlides.setPower(0);
+            robot.rightSlides.setPower(0);
+
+            robot.leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            robot.leftSlides.setPower(-0.25);
+            robot.rightSlides.setPower(-0.25);
+            //
+//            robot.leftSlides.setPower(0);
+//            robot.rightSlides.setPower(0);
+        }
+    }
+
+
     @Override //when init is pressed
     public void runOpMode(){
         robot.initMotors(hardwareMap);
@@ -30,21 +75,34 @@ public class Holonomic extends LinearOpMode {
         robot.setFront(hardwareMap);
         //robot.initIMU(hardwareMap);
         robot.useEncoders(false);//don't need encoders for teleop
+        robot.initLinearSlides(hardwareMap);
 
         waitForStart();
         runtime.reset();
 
         while (opModeIsActive()) {
             //forks
-             //robot.servoRight.setPosition(0.3);
              robot.setRightClaw(gamepad1.b);//pressing a changes fork position, up to down, or vice versa
              robot.setLeftClaw(gamepad1.x);
+             robot.setHinge(gamepad2.b);
+             robot.setStoneArm(gamepad2.a);
              robot.hookFoundation(gamepad1.a);//pressing a changes claw position, up to down, or vice versa
              robot.setSpeed(gamepad1.left_bumper, gamepad1.right_bumper);
 
+            if(gamepad2.right_bumper)
+                moveSlides(50);
+            else if(gamepad2.left_bumper)
+                moveSlides(-50);
+            else if(gamepad2.y && robot.slidesDown())
+                moveSlides(-250);
+            else if(gamepad2.x) {
+                robot.leftSlides.setPower(0);
+                robot.rightSlides.setPower(0);
+            }
+
             robot.drive(gamepad1.left_stick_x,
                         gamepad1.left_stick_y,
-                        -gamepad1.right_stick_x);
+                        gamepad1.right_stick_x);
 
             telemetry.addData("Drive", "Holonomic");
             //telemetry.addData("Global Heading", robot.getAngle());
@@ -52,6 +110,8 @@ public class Holonomic extends LinearOpMode {
             telemetry.addData("left servo", robot.servoLeft.getPosition());
             telemetry.addData("right servo", robot.servoRight.getPosition());
             telemetry.addData("foundationPos", robot.bar.getPosition());
+            telemetry.addData("hinge", robot.hinge.getPosition());
+            telemetry.addData("stoneArm", robot.stoneArm.getPosition());
 
             telemetry.update();
         }

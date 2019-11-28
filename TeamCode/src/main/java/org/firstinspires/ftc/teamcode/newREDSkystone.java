@@ -58,9 +58,9 @@ import pkg3939.skystoneDetectorClass;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="AutoTemplate2", group="Pushbot")
+@Autonomous(name="newREDSkystone", group="Pushbot")
 //@Disabled
-public class AutoTemplate2 extends LinearOpMode {
+public class newREDSkystone extends LinearOpMode {
 
     /* Declare OpMode members. */
     Robot3939 robot = new Robot3939();   // Use a Pushbot's hardware
@@ -93,49 +93,11 @@ public class AutoTemplate2 extends LinearOpMode {
 
     }
 
-    public void runToAngle(double targetAngle, double threshold) {
-        double angleDifference = targetAngle - robot.getAngle();
-        double power = 0.01*Math.abs(angleDifference) + 0.1;
-
-        if(angleDifference < 0)
-            power = -power;
-
-        robot.useEncoders(false);
-
-        robot.FL.setPower(power);
-        robot.FR.setPower(-power);
-        robot.RL.setPower(power);
-        robot.RR.setPower(-power);
-
-        boolean run = true;
-
-        runtime.reset();
-        while (opModeIsActive() && run) {
-            telemetry.addData("angle difference", angleDifference);
-            telemetry.addData("power", robot.FL.getPower());
-            telemetry.update();
-            if(Math.abs(robot.getAngle() - targetAngle) < threshold)
-                run = false;
-            if(runtime.seconds() > 4)
-                run = false;
-        }
-
-        // Step 4:  Stop and close the claw.
-        robot.FL.setPower(0);
-        robot.FR.setPower(0);
-        robot.RL.setPower(0);
-        robot.RR.setPower(0);
-        sleep(200);
-
-        robot.useEncoders(true);
-    }
-
-    public void rotateAngle(double power, double angle, double threshold) {
+    public void rotateAngle(double power, double angle) {
         angle = -angle;
         if(angle < 0)
             power = -power;
 
-        robot.useEncoders(false);
 
         robot.FL.setPower(power);
         robot.FR.setPower(-power);
@@ -144,12 +106,10 @@ public class AutoTemplate2 extends LinearOpMode {
 
         double newAngle = robot.getAngle() + angle;
         boolean run = true;
+        double angleRange = 15f;
 
-        runtime.reset();
         while (opModeIsActive() && run) {
-            if(Math.abs(robot.getAngle() - newAngle) < threshold)
-                run = false;
-            if(runtime.seconds() > 4)
+            if(Math.abs(robot.getAngle() - newAngle) < angleRange)
                 run = false;
         }
 
@@ -159,8 +119,6 @@ public class AutoTemplate2 extends LinearOpMode {
         robot.RL.setPower(0);
         robot.RR.setPower(0);
         sleep(200);
-
-        robot.useEncoders(true);
 
     }
 
@@ -260,9 +218,9 @@ public class AutoTemplate2 extends LinearOpMode {
 
 
     public void moveDistanceEnc(double power, double distance) {
-        robot.stopAndResetEncoders();
-
-        robot.useEncoders(true);
+//        robot.stopAndResetEncoders();
+//
+//        robot.useEncoders(true);
 
         double rotations = distance/ wheelCircumference; //distance / circumference (inches)
         int targetTicks = (int)(rotations*ticksPerRev);
@@ -284,11 +242,11 @@ public class AutoTemplate2 extends LinearOpMode {
 
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes working
-                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
-                robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-                robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-                robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-                robot.RL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
+//                robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.RL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
                 telemetry.addData("Path", "Driving "+distance+" inches");
                 telemetry.update();
             }
@@ -298,7 +256,7 @@ public class AutoTemplate2 extends LinearOpMode {
             telemetry.addData("Path", "Complete");
             telemetry.update();
 
-            robot.useEncoders(true);
+//            robot.useEncoders(true);
         }
     }
 
@@ -327,11 +285,11 @@ public class AutoTemplate2 extends LinearOpMode {
 
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes working
-                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
-                robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-                robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-                robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-                robot.RL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
+//                robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.RL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
                 telemetry.addData("Path", "Driving "+distance+" inches");
                 telemetry.update();
             }
@@ -353,12 +311,13 @@ public class AutoTemplate2 extends LinearOpMode {
          */
         robot.initMotors(hardwareMap);
         robot.initServos(hardwareMap);//servo
+        robot.setFront(hardwareMap);
         robot.initIMU(hardwareMap);//gyro
 
         detector.setOffset(1.7f/8f, 1.2f/8f);
         detector.camSetup(hardwareMap);
 
-        robot.useEncoders(true);
+        robot.useEncoders(false);
 
 //        telemetry.addData("Mode", "calibrating...");
 //        telemetry.update();
@@ -373,27 +332,50 @@ public class AutoTemplate2 extends LinearOpMode {
         telemetry.addData("Status", "Ready to run");
         telemetry.update();
 
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         if(opModeIsActive()) {
+            robot.servoLeft.setPosition(0.66);
+            robot.servoRight.setPosition(0);
 
             detector.updateVals();
             vals = detector.getVals();
             telemetry.addData("Values", vals[1] + "   " + vals[0] + "   " + vals[2]);
-            telemetry.addLine("hi");
-
             telemetry.update();
 
-//            strafeEnc(0.5, 24);
-//            mySleep(5);
-//            strafeEnc(0.5, -24);
-            double oldAngle = robot.getAngle();
-            rotateAngle(0.5, 90, 15);
-            runToAngle(oldAngle + 90, 7);
+            if(vals[0] == 0){//middle
+                moveDistanceGyro(0.4, 1.6);//first forward
+                robot.servoLeft.setPosition(0.33);//grab skystone
+                mySleep(0.5);
+                moveDistanceGyro(-0.3, 0.75);//back
+                strafeGyro(0.4, 4.2 );
+                robot.servoLeft.setPosition(0.66);//let go of skystone
+                mySleep(0.5);
+                strafeGyro(-0.4, 1.2);//go back to park
+            } else if(vals[1] == 0) {//left
+                moveDistanceGyro(0.4, 1.6);//first forward
+                strafe(-0.4, 0.7);//left
+                robot.servoLeft.setPosition(0.33);//grab skystone
+                mySleep(0.5);//wait
+                moveDistanceGyro(-0.3, 0.75);//back
+                strafeGyro(0.4, 4.8);
+                robot.servoLeft.setPosition(0.66);//let go of skystone
 
+                mySleep(0.5);
+                strafeGyro(-0.4, 1.2);//go back to park
+            } else {//right
+                moveDistanceGyro(0.4, 1.6);//first forward
+                strafeGyro(0.4, 0.7);//right
+                robot.servoLeft.setPosition(0.33);//grab skystone
+                mySleep(0.5);
+                moveDistanceGyro(-0.3, 0.75);//back
+                strafeGyro(0.4, 3.7);//1.65
+                robot.servoLeft.setPosition(0.66);//let go of skystone
 
-//            moveDistanceEnc(0.5, 24);
-
+                mySleep(0.5);
+                strafeGyro(-0.4, 1.2);//go back to park
+            }
 
             telemetry.addData("Path", "Complete");
             telemetry.update();

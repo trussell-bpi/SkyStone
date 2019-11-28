@@ -23,10 +23,8 @@ public class HolonomicGyro extends LinearOpMode {
 
     public static final boolean earthIsFlat = true;
 
-
     @Override //when init is pressed
     public void runOpMode(){
-
         //Naming, Initialization of the hardware, use this deviceName in the robot controller phone
         //use the name of the object in the code
         robot.initMotors(hardwareMap);
@@ -47,6 +45,8 @@ public class HolonomicGyro extends LinearOpMode {
             robot.setLeftClaw(gamepad1.x);
             robot.hookFoundation(gamepad1.a);//pressing a changes claw position, up to down, or vice versa
             robot.setSpeed(gamepad1.left_bumper, gamepad1.right_bumper);
+
+
 
             double angle = robot.getAngle();
             if(angle < 0)

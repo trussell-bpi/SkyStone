@@ -20,6 +20,8 @@ public class Robot3939 {
     public DcMotor leftSlides, rightSlides;//linear slide motors
     public Servo servoRight, servoLeft;//autonomous claw servos
     public Servo bar;//foundation mover servo
+    public Servo stoneArm;
+    public Servo hinge;
 
     public BNO055IMU imu;//gyro
     private Orientation lastAngles = new Orientation();//saves angles
@@ -31,7 +33,7 @@ public class Robot3939 {
     public static final double deadZone = 0.10;
     public static final boolean earthIsFlat = true;
 
-    private final int encoderTicks = 1120;
+    private final double encoderTicks = 537.6;
     public final double wheelDiameter = 3.85827;//in inches
 
     public void initMotors(HardwareMap hwmap) {
@@ -43,12 +45,28 @@ public class Robot3939 {
         RL.setDirection(DcMotorSimple.Direction.FORWARD);
         FL.setDirection(DcMotorSimple.Direction.REVERSE);
         RR.setDirection(DcMotorSimple.Direction.REVERSE);
-        FR.setDirection(DcMotorSimple.Direction.REVERSE);
+        FR.setDirection(DcMotorSimple.Direction.FORWARD);
     }
+
 
     public void initLinearSlides(HardwareMap hwmap) {
         leftSlides = hwmap.dcMotor.get("leftSlides");
         rightSlides = hwmap.dcMotor.get("rightSlides");
+
+        leftSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftSlides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightSlides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        leftSlides.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightSlides.setDirection(DcMotorSimple.Direction.FORWARD);
+
+
+
     }
 
     public void setFront(HardwareMap hwmap) {
@@ -58,10 +76,14 @@ public class Robot3939 {
         FR.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
+
+
     public void initServos(HardwareMap hwmap) {
         servoRight = hwmap.servo.get("servoRight");
         servoLeft = hwmap.servo.get("servoLeft");
         bar = hwmap.servo.get("bar");
+        stoneArm = hwmap.servo.get("stoneArm");
+        hinge = hwmap.servo.get("hinge");
     }
 
     public void initIMU(HardwareMap hwmap) {
@@ -78,6 +100,8 @@ public class Robot3939 {
 
         imu.initialize(parameters);
     }
+
+
 
     public void useEncoders(boolean status) {
         if(status) {
@@ -248,12 +272,22 @@ public class Robot3939 {
 //        setAllpower();
 //    }
 
-    boolean barDown = false;
+    boolean barUp = true;
     boolean aHeld = false;
     boolean bHeld = false;
+    boolean a2Held = false;
+    boolean b2Held = false;
     boolean leftClaw = false;
     boolean rightClaw = false;
+    boolean hingeTurn = false;
+    boolean stoneArmGrab = false;
     boolean xHeld = false;
+
+    public boolean slidesDown() {
+        if(leftSlides.getPower() == 0 && rightSlides.getPower() == 0)
+            return true;
+        return false;
+    }
 
     public void setLeftClaw(boolean xPressed) {
         if (!xHeld && xPressed) {
@@ -263,7 +297,7 @@ public class Robot3939 {
             xHeld = false;
 
         if (leftClaw) //down
-            servoLeft.setPosition(0.32);
+            servoLeft.setPosition(0.33);
 
         else if(earthIsFlat)//up
             servoLeft.setPosition(0.66);
@@ -278,25 +312,58 @@ public class Robot3939 {
             bHeld = false;
 
         if (rightClaw) //down
-            servoRight.setPosition(0.34);
+            servoRight.setPosition(0.32);
         else if(earthIsFlat)//up
             servoRight.setPosition(0);
+    }
 
+    public void setHinge(boolean b2Pressed) {
+        if(!b2Held && b2Pressed) {
+            b2Held = true;
+            hingeTurn = !hingeTurn;
+        } else if(!b2Pressed)
+            b2Held = false;
+
+        if(hingeTurn)//down
+            hinge.setPosition(0.7);
+        else//up
+            hinge.setPosition(0.025);
+    }
+
+    public void setStoneArm(boolean a2Pressed) {
+        if(!a2Held && a2Pressed) {
+            a2Held = true;
+            stoneArmGrab = !stoneArmGrab;
+        } else if(!a2Pressed)
+            a2Held = false;
+
+        if(stoneArmGrab)//down
+            stoneArm.setPosition(0);
+        else//up
+            stoneArm.setPosition(0.33);
+    }
+
+    public void foundationUp() {
+        bar.setPosition(0);
+    }
+
+    public void foundationDown() {
+        bar.setPosition(0.6);//joe
     }
 
     public void hookFoundation(boolean aPressed) {
         if (!aHeld && aPressed) {
             aHeld = true;
-            barDown = !barDown;
+            barUp = !barUp;
         } else if (!aPressed)
             aHeld = false;
 
-        if (barDown) {//if true, set pos to down
-            bar.setPosition(1);//joe
+        if (barUp) {//if true, set pos to down
+            foundationDown();
         }
         else if(earthIsFlat)//else, up
         {
-            bar.setPosition(0);
+            foundationUp();
         }
     }
 
@@ -338,7 +405,9 @@ public class Robot3939 {
      * See if we are moving in a straight line and if not return a power correction value.
      * @return Power adjustment, + is adjust left - is adjust right.
      */
-    public double checkDirection(double startAngle, double power)
+
+
+    public double getCorrection(double startAngle, double power)
     {
         // The gain value determines how sensitive the correction is to direction changes.
         // You will have to experiment with your robot to get small smooth direction changes
