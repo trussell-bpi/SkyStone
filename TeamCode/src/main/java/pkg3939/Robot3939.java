@@ -289,6 +289,24 @@ public class Robot3939 {
         return false;
     }
 
+    public void leftClawDown() {
+        servoLeft.setPosition(0.33);
+
+    }
+
+    public void leftClawUp() {
+        servoLeft.setPosition(0.66);
+
+    }
+
+    public void rightClawDown() {
+        servoRight.setPosition(0.32);
+    }
+
+    public void rightClawUp() {
+        servoRight.setPosition(0);
+    }
+
     public void setLeftClaw(boolean xPressed) {
         if (!xHeld && xPressed) {
             xHeld = true;
@@ -325,9 +343,9 @@ public class Robot3939 {
             b2Held = false;
 
         if(hingeTurn)//down
-            hinge.setPosition(0.7);
+            hinge.setPosition(0.735);
         else//up
-            hinge.setPosition(0.025);
+            hinge.setPosition(0.065 );
     }
 
     public void setStoneArm(boolean a2Pressed) {
@@ -338,7 +356,7 @@ public class Robot3939 {
             a2Held = false;
 
         if(stoneArmGrab)//down
-            stoneArm.setPosition(0);
+            stoneArm.setPosition(0.05);
         else//up
             stoneArm.setPosition(0.33);
     }

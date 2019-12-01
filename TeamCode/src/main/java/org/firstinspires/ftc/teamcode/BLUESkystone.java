@@ -59,9 +59,9 @@ import pkg3939.skystoneDetectorClass;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="AutoTemplate2", group="Pushbot")
+@Autonomous(name="BLUESkystone", group="Pushbot")
 //@Disabled
-public class AutoTemplate2 extends LinearOpMode {
+public class BLUESkystone extends LinearOpMode {
 
     /* Declare OpMode members. */
     Robot3939 robot = new Robot3939();   // Use a Pushbot's hardware
@@ -337,11 +337,11 @@ public class AutoTemplate2 extends LinearOpMode {
         double rotations = distance/ wheelCircumference; //distance / circumference (inches)
         int targetTicks = (int)(rotations*ticksPerRev);
 
-        double tickAvg = (int)((robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4);
+        double tickAvg = (int)((Math.abs(robot.FL.getCurrentPosition()) + Math.abs(robot.FR.getCurrentPosition()) + Math.abs(robot.RL.getCurrentPosition()) + Math.abs(robot.RR.getCurrentPosition()))/4.0);
         double tickDifference = targetTicks - tickAvg;
-        double power = Range.clip(k*Math.abs(tickDifference) + 0.1, 0.1, 0.8);
+        double power = Range.clip(k*Math.abs(tickDifference) + 0.3, 0.3, 0.8);
 
-        if(tickDifference < 0)
+        if(distance < 0)
             power = -power;
 
         if(opModeIsActive()) {
@@ -362,9 +362,9 @@ public class AutoTemplate2 extends LinearOpMode {
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes
 
-                tickAvg = (int)((robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4.0);
+                tickAvg = (int)((Math.abs(robot.FL.getCurrentPosition()) + Math.abs(robot.FR.getCurrentPosition()) + Math.abs(robot.RL.getCurrentPosition()) + Math.abs(robot.RR.getCurrentPosition()))/4.0);
                 tickDifference = targetTicks - tickAvg;
-                power = Range.clip(k*Math.abs(tickDifference) + 0.1, 0.1, 0.8);
+                power = Range.clip(k*Math.abs(tickDifference) + 0.3, 0.3, 0.8);
 
                 if(tickDifference < 0)
                     power = -power;
@@ -376,7 +376,9 @@ public class AutoTemplate2 extends LinearOpMode {
 
                 robot.setAllGivenPower(power);
 
-                telemetry.addData("Path", "Driving "+distance+" inches");
+                telemetry.addData("Ticks target", targetTicks);
+                telemetry.addData("distance target", distance);
+
                 telemetry.addData("tickDifference", tickDifference);
                 telemetry.addData("power", power);
                 telemetry.update();
@@ -554,7 +556,7 @@ public class AutoTemplate2 extends LinearOpMode {
         robot.initServos(hardwareMap);//servo
         robot.initIMU(hardwareMap);//gyro
 
-        detector.setOffset(1.4f/8f, 1.7f/8f);
+        detector.setOffset(1.0f/8f, 1.7f/8f);
         detector.camSetup(hardwareMap);
 
         robot.useEncoders(true);
@@ -581,12 +583,62 @@ public class AutoTemplate2 extends LinearOpMode {
             telemetry.addLine("hi");
 
             telemetry.update();
-//
-//            moveEncoderDifferential(48);
-//            moveEncoderDifferential(-48);
-            rotateEnc(2000);
-            mySleep(0.5);
-            strafeGyro(0.7,2);
+
+            if(vals[0] == 0){//middle
+                moveEncoderDifferential(10);
+                strafeGyro(-0.7, 2);
+                robot.leftClawDown();
+                mySleep(0.5);
+                strafeGyro(0.7, 1);
+                moveEncoderDifferential(-60);
+                robot.leftClawUp();
+                mySleep(0.5);
+                moveEncoderDifferential(20);//-73
+//                strafeGyro(-0.7, 1);
+//                robot.leftClawDown();
+//                mySleep(0.5);
+//                strafeGyro(1, 0.5);
+//                moveEncoderDifferential(90);
+//                robot.leftClawUp();
+//                mySleep(0.5);
+//                moveEncoderDifferential(-30);
+            } else if(vals[1] == 0) {//left
+                strafeGyro(-0.7, 2);
+                robot.leftClawDown();
+                mySleep(0.5);
+                strafeGyro(0.7, 1);
+                moveEncoderDifferential(-55);
+                robot.leftClawUp();
+                mySleep(0.5);
+                moveEncoderDifferential(20);//-73
+//                strafeGyro(-0.7, 1);
+//                robot.leftClawDown();
+//                mySleep(0.5);
+//                strafeGyro(1, 0.5);
+//                moveEncoderDifferential(90);
+//                robot.leftClawUp();
+//                mySleep(0.5);
+//                moveEncoderDifferential(-30);
+            } else {//right
+                moveEncoderDifferential(17);
+                strafeGyro(-0.7, 2);
+                robot.leftClawDown();
+                mySleep(0.5);
+                strafeGyro(0.7, 1);
+                moveEncoderDifferential(-65);
+                robot.leftClawUp();
+                mySleep(0.5);
+                moveEncoderDifferential(20);//-73
+//                strafeGyro(-0.7, 1);
+//                robot.leftClawDown();
+//                mySleep(0.5);
+//                strafeGyro(1, 0.5);
+//                moveEncoderDifferential(90);
+//                robot.leftClawUp();
+//                mySleep(0.5);
+//                moveEncoderDifferential(-30);
+            }
+
 
             telemetry.addData("Path", "Complete");
             telemetry.update();

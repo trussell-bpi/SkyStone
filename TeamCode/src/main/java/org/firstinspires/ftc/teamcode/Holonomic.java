@@ -24,8 +24,8 @@ public class Holonomic extends LinearOpMode {
 
     public static final boolean earthIsFlat = true;
 
-    public void moveSlides(int constant) {
-        if(opModeIsActive()) {
+    public void moveSlides(double power, int constant) {
+        if (opModeIsActive()) {
             robot.leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -35,19 +35,19 @@ public class Holonomic extends LinearOpMode {
             robot.leftSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.rightSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            robot.leftSlides.setPower(1);
-            robot.rightSlides.setPower(1);
+            robot.leftSlides.setPower(power);
+            robot.rightSlides.setPower(power);
 
             runtime.reset();
 
-            while(robot.leftSlides.isBusy() || robot.rightSlides.isBusy()) {
+            while (robot.leftSlides.isBusy() || robot.rightSlides.isBusy()) {
                 //wait till motor finishes working
                 robot.drive(gamepad1.left_stick_x,
                         gamepad1.left_stick_y,
                         gamepad1.right_stick_x);
                 telemetry.addLine("Slides Extending");
                 telemetry.update();
-                if(runtime.seconds() > 1.2 )
+                if (runtime.seconds() > 1.2)
                     break;
             }
             telemetry.addLine("Extended");
@@ -69,7 +69,7 @@ public class Holonomic extends LinearOpMode {
 
 
     @Override //when init is pressed
-    public void runOpMode(){
+    public void runOpMode() {
         robot.initMotors(hardwareMap);
         robot.initServos(hardwareMap);
         robot.setFront(hardwareMap);
@@ -77,43 +77,68 @@ public class Holonomic extends LinearOpMode {
         robot.useEncoders(false);//don't need encoders for teleop
         robot.initLinearSlides(hardwareMap);
 
+        boolean driver = true;
+        boolean yHeld = false;
+        boolean dUpHeld = false;
+
         waitForStart();
         runtime.reset();
 
         while (opModeIsActive()) {
             //forks
-             robot.setRightClaw(gamepad1.b);//pressing a changes fork position, up to down, or vice versa
-             robot.setLeftClaw(gamepad1.x);
-             robot.setHinge(gamepad2.b);
-             robot.setStoneArm(gamepad2.a);
-             robot.hookFoundation(gamepad1.a);//pressing a changes claw position, up to down, or vice versa
-             robot.setSpeed(gamepad1.left_bumper, gamepad1.right_bumper);
+            robot.setRightClaw(gamepad1.b);//pressing a changes fork position, up to down, or vice versa
+            robot.hookFoundation(gamepad1.a);//pressing a changes claw position, up to down, or vice versa
+            robot.setSpeed(gamepad1.left_bumper, gamepad1.right_bumper);
+            robot.setLeftClaw(gamepad1.x);
 
-            if(gamepad2.right_bumper)
-                moveSlides(50);
-            else if(gamepad2.left_bumper)
-                moveSlides(-50);
-            else if(gamepad2.y && robot.slidesDown())
-                moveSlides(-250);
-            else if(gamepad2.x) {
+            robot.setHinge(gamepad2.b);
+            robot.setStoneArm(gamepad2.a);
+            if (gamepad2.right_bumper)
+                moveSlides(0.5, 20);
+            else if (gamepad2.left_bumper)
+                moveSlides(1, -50);
+            else if (gamepad2.y && robot.slidesDown())
+                moveSlides(1, -225);
+            else if (gamepad2.x) {
                 robot.leftSlides.setPower(0);
                 robot.rightSlides.setPower(0);
             }
 
-            robot.drive(gamepad1.left_stick_x,
-                        gamepad1.left_stick_y,
-                        gamepad1.right_stick_x);
+            if (!yHeld && gamepad1.y) {
+                yHeld = true;
+                driver = !driver;
+            } else if (!gamepad1.y) {
+                yHeld = false;
+            }
 
-            telemetry.addData("Drive", "Holonomic");
-            //telemetry.addData("Global Heading", robot.getAngle());
-            telemetry.addData("speed", robot.speed);
-            telemetry.addData("left servo", robot.servoLeft.getPosition());
-            telemetry.addData("right servo", robot.servoRight.getPosition());
-            telemetry.addData("foundationPos", robot.bar.getPosition());
-            telemetry.addData("hinge", robot.hinge.getPosition());
-            telemetry.addData("stoneArm", robot.stoneArm.getPosition());
+            if(!dUpHeld && gamepad2.dpad_up) {
+                dUpHeld = true;
+                driver = !driver;
+            } else if(gamepad2.dpad_up)
+                dUpHeld = false;
 
-            telemetry.update();
+            if (driver)
+                robot.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+            else
+                robot.drive(gamepad2.left_stick_x * 0.5,
+                        gamepad2.left_stick_y * 0.5,
+                        gamepad2.right_stick_x * 0.5);
+
+
+                telemetry.addData("Drive", "Holonomic");
+                //telemetry.addData("Global Heading", robot.getAngle());
+                telemetry.addData("LX", gamepad1.left_stick_x);
+                telemetry.addData("LY", gamepad1.left_stick_y);
+                telemetry.addData("RX", gamepad1.right_stick_y);
+
+                telemetry.addData("speed", robot.speed);
+                telemetry.addData("left servo", robot.servoLeft.getPosition());
+                telemetry.addData("right servo", robot.servoRight.getPosition());
+                telemetry.addData("foundationPos", robot.bar.getPosition());
+                telemetry.addData("hinge", robot.hinge.getPosition());
+                telemetry.addData("stoneArm", robot.stoneArm.getPosition());
+
+                telemetry.update();
+            }
         }
     }
-}
