@@ -356,7 +356,7 @@ public class Robot3939 {
             a2Held = false;
 
         if(stoneArmGrab)//down
-            stoneArm.setPosition(0.05);
+            stoneArm.setPosition(0.03);
         else//up
             stoneArm.setPosition(0.33);
     }

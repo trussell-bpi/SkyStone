@@ -59,9 +59,9 @@ import pkg3939.skystoneDetectorClass;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="BLUESkystone", group="Pushbot")
+@Autonomous(name="BLUEFoundation", group="Pushbot")
 //@Disabled
-public class BLUESkystone extends LinearOpMode {
+public class BLUEFoundation extends LinearOpMode {
 
     /* Declare OpMode members. */
     Robot3939 robot = new Robot3939();   // Use a Pushbot's hardware
@@ -339,7 +339,7 @@ public class BLUESkystone extends LinearOpMode {
 
         double tickAvg = (int)((Math.abs(robot.FL.getCurrentPosition()) + Math.abs(robot.FR.getCurrentPosition()) + Math.abs(robot.RL.getCurrentPosition()) + Math.abs(robot.RR.getCurrentPosition()))/4.0);
         double tickDifference = targetTicks - tickAvg;
-        double power = Range.clip(k*Math.abs(tickDifference) + 0.3, 0.3, 0.8);
+        double power = Range.clip(k*Math.abs(tickDifference) + 0.2, 0.2, 0.8);
 
         if(distance < 0)
             power = -power;
@@ -364,7 +364,7 @@ public class BLUESkystone extends LinearOpMode {
 
                 tickAvg = (int)((Math.abs(robot.FL.getCurrentPosition()) + Math.abs(robot.FR.getCurrentPosition()) + Math.abs(robot.RL.getCurrentPosition()) + Math.abs(robot.RR.getCurrentPosition()))/4.0);
                 tickDifference = targetTicks - tickAvg;
-                power = Range.clip(k*Math.abs(tickDifference) + 0.3, 0.3, 0.8);
+                power = Range.clip(k*Math.abs(tickDifference) + 0.2, 0.2, 0.8);
 
                 if(tickDifference < 0)
                     power = -power;
@@ -584,62 +584,19 @@ public class BLUESkystone extends LinearOpMode {
 
             telemetry.update();
 
-            if(vals[0] == 0){//middle
-                moveEncoderDifferential(8);
-                strafeGyro(-0.7, 2);
-                robot.leftClawDown();
-                mySleep(0.5);
-                strafeGyro(0.7, 1);
-                moveEncoderDifferential(-60);
-                robot.leftClawUp();
-                mySleep(0.5);
-                moveEncoderDifferential(20);//-73
-//                strafeGyro(-0.7, 1);
-//                robot.leftClawDown();
-//                mySleep(0.5);
-//                strafeGyro(1, 0.5);
-//                moveEncoderDifferential(90);
-//                robot.leftClawUp();
-//                mySleep(0.5);
-//                moveEncoderDifferential(-30);
-            } else if(vals[1] == 0) {//left
-                strafeGyro(-0.7, 2);
-                robot.leftClawDown();
-                mySleep(0.5);
-                strafeGyro(0.7, 1);
-                moveEncoderDifferential(-55);
-                robot.leftClawUp();
-                mySleep(0.5);
-                moveEncoderDifferential(20);//-73
-//                strafeGyro(-0.7, 1);
-//                robot.leftClawDown();
-//                mySleep(0.5);
-//                strafeGyro(1, 0.5);
-//                moveEncoderDifferential(90);
-//                robot.leftClawUp();
-//                mySleep(0.5);
-//                moveEncoderDifferential(-30);
-            } else {//right
-                moveEncoderDifferential(16);
-                strafeGyro(-0.7, 2);
-                robot.leftClawDown();
-                mySleep(0.5);
-                strafeGyro(0.7, 1);
-                moveEncoderDifferential(-65);
-                robot.leftClawUp();
-                mySleep(0.5);
-                moveEncoderDifferential(20);//-73
-//                strafeGyro(-0.7, 1);
-//                robot.leftClawDown();
-//                mySleep(0.5);
-//                strafeGyro(1, 0.5);
-//                moveEncoderDifferential(90);
-//                robot.leftClawUp();
-//                mySleep(0.5);
-//                moveEncoderDifferential(-30);
-            }
-            strafeGyro(-0.8, 0.5);
+            robot.foundationDown();
+            strafeGyro(0.7, 0.8);
+            moveEncoderDifferential(-35);
+            robot.foundationUp();
+            mySleep(0.5);
+            moveEncoderDifferential(30);
+            runToAngle(robot.getAngle() + 100, 5);
+            moveEncoderDifferential(-42);
+            robot.foundationDown();
+            mySleep(0.5);
 
+            strafeGyro(-0.7, 0.5);
+            moveEncoderDifferential(37);
 
             telemetry.addData("Path", "Complete");
             telemetry.update();

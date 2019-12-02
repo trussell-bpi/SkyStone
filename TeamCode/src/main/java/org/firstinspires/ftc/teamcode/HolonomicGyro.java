@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import pkg3939.Robot3939;
@@ -23,32 +24,151 @@ public class HolonomicGyro extends LinearOpMode {
 
     public static final boolean earthIsFlat = true;
 
+    public void moveSlides(double power, int constant) {
+        if (opModeIsActive()) {
+            robot.leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            robot.leftSlides.setTargetPosition(robot.leftSlides.getCurrentPosition() + constant);
+            robot.rightSlides.setTargetPosition(robot.rightSlides.getCurrentPosition() + constant);
+
+            robot.leftSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            robot.leftSlides.setPower(power);
+            robot.rightSlides.setPower(power);
+
+            runtime.reset();
+
+            while (robot.leftSlides.isBusy() || robot.rightSlides.isBusy()) {
+                //wait till motor finishes working
+                robot.drive(gamepad1.left_stick_x,
+                        gamepad1.left_stick_y,
+                        gamepad1.right_stick_x);
+                telemetry.addLine("Slides Extending");
+                telemetry.update();
+                if (runtime.seconds() > 1.2)
+                    break;
+            }
+            telemetry.addLine("Extended");
+            telemetry.update();
+
+            robot.leftSlides.setPower(0);
+            robot.rightSlides.setPower(0);
+
+            robot.leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            robot.leftSlides.setPower(-0.25);
+            robot.rightSlides.setPower(-0.25);
+            //
+//            robot.leftSlides.setPower(0);
+//            robot.rightSlides.setPower(0);
+        }
+    }
+
+
     @Override //when init is pressed
-    public void runOpMode(){
-        //Naming, Initialization of the hardware, use this deviceName in the robot controller phone
-        //use the name of the object in the code
+    public void runOpMode() {
         robot.initMotors(hardwareMap);
         robot.initServos(hardwareMap);
-        robot.initIMU(hardwareMap);
         robot.setFront(hardwareMap);
+        //robot.initIMU(hardwareMap);
+        robot.useEncoders(false);//don't need encoders for teleop
+        robot.initLinearSlides(hardwareMap);
 
-        robot.useEncoders(false);
+        boolean driver = true;
+        boolean yHeld = false;
+        boolean lsbHeld = false;
+        boolean useNormal = true;
+        boolean dUpHeld = false;
+        boolean initIMU = true;
 
         waitForStart();
         runtime.reset();
 
         while (opModeIsActive()) {
-            double LX = gamepad1.left_stick_x, LY = -gamepad1.left_stick_y, RX = -gamepad1.right_stick_x;
-
             //forks
+            double LX = gamepad1.left_stick_x, LY = -gamepad1.left_stick_y, RX = gamepad1.right_stick_y;
+
             robot.setRightClaw(gamepad1.b);//pressing a changes fork position, up to down, or vice versa
-            robot.setLeftClaw(gamepad1.x);
             robot.hookFoundation(gamepad1.a);//pressing a changes claw position, up to down, or vice versa
             robot.setSpeed(gamepad1.left_bumper, gamepad1.right_bumper);
+            robot.setLeftClaw(gamepad1.x);
+
+            robot.setHinge(gamepad2.b);
+            robot.setStoneArm(gamepad2.a);
+            if (gamepad2.right_bumper)
+                moveSlides(0.5, 20);
+            else if (gamepad2.left_bumper)
+                moveSlides(1, -50);
+            else if (gamepad2.y && robot.slidesDown())
+                moveSlides(1, -225);
+            else if (gamepad2.x) {
+                robot.leftSlides.setPower(0);
+                robot.rightSlides.setPower(0);
+            }
+
+            if (!yHeld && gamepad1.y) {
+                yHeld = true;
+                driver = !driver;
+            } else if (!gamepad1.y) {
+                yHeld = false;
+            }
+
+            if(!dUpHeld && gamepad2.dpad_up) {
+                dUpHeld = true;
+                driver = !driver;
+            } else if(gamepad2.dpad_up)
+                dUpHeld = false;
+
+            if(!lsbHeld && gamepad1.left_stick_button) {
+                lsbHeld = true;
+                useNormal = false;
+            } else if(!gamepad1.left_stick_button)
+                lsbHeld = false;
+
+            if(!useNormal) {
+                if(initIMU) {
+                    robot.initIMU(hardwareMap);
+                    initIMU = false;
+                }
+                double angle = robot.getAngle();
+                if(angle < 0)
+                    angle += 360.0;
+
+                //robot drive
+                double coords[] = robot.getComponents(LX, LY, angle);
+                double newLX = coords[0];
+                double newLY = coords[1];
+
+                robot.drive(newLX,newLY,RX);
+            } else {
+                robot.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+            }
 
 
+            telemetry.addData("Drive", "Holonomic");
+            //telemetry.addData("Global Heading", robot.getAngle());
+            telemetry.addData("LX", gamepad1.left_stick_x);
+            telemetry.addData("LY", gamepad1.left_stick_y);
+            telemetry.addData("RX", gamepad1.right_stick_y);
 
-            double angle = robot.getAngle();
+            telemetry.addData("speed", robot.speed);
+            telemetry.addData("left servo", robot.servoLeft.getPosition());
+            telemetry.addData("right servo", robot.servoRight.getPosition());
+            telemetry.addData("foundationPos", robot.bar.getPosition());
+            telemetry.addData("hinge", robot.hinge.getPosition());
+            telemetry.addData("stoneArm", robot.stoneArm.getPosition());
+
+            telemetry.update();
+        }
+    }
+}
+
+
+/*
+double angle = robot.getAngle();
             if(angle < 0)
                 angle += 360.0;
 
@@ -58,13 +178,4 @@ public class HolonomicGyro extends LinearOpMode {
             double newLY = coords[1];
 
             robot.drive(newLX,newLY,RX);
-
-            telemetry.addData("LX", newLX);
-            telemetry.addData("LY", newLY);
-            telemetry.addData("Drive", "Holonomic");
-            telemetry.addData("Global Heading", angle);
-            telemetry.addData("speed", robot.speed);
-            telemetry.update();
-        }
-    }
-}
+ */

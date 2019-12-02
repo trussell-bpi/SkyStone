@@ -620,7 +620,7 @@ public class REDSkystone extends LinearOpMode {
 //                mySleep(0.5);
 //                moveEncoderDifferential(-30);
             } else {//right
-                moveEncoderDifferential(15);
+                moveEncoderDifferential(17);
                 strafeGyro(-0.7, 2);
                 robot.leftClawDown();
                 mySleep(0.5);
