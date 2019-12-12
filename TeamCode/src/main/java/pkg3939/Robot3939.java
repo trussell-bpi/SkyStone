@@ -48,7 +48,6 @@ public class Robot3939 {
         FR.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
-
     public void initLinearSlides(HardwareMap hwmap) {
         leftSlides = hwmap.dcMotor.get("leftSlides");
         rightSlides = hwmap.dcMotor.get("rightSlides");
@@ -64,24 +63,18 @@ public class Robot3939 {
 
         leftSlides.setDirection(DcMotorSimple.Direction.REVERSE);
         rightSlides.setDirection(DcMotorSimple.Direction.FORWARD);
-
-
-
     }
 
     public void setFront(HardwareMap hwmap) {
         RL.setDirection(DcMotorSimple.Direction.REVERSE);
-        FL.setDirection(DcMotorSimple.Direction.FORWARD);
+        FL.setDirection(DcMotorSimple.Direction.REVERSE);
         RR.setDirection(DcMotorSimple.Direction.FORWARD);
-        FR.setDirection(DcMotorSimple.Direction.REVERSE);
+        FR.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
-
-
     public void initServos(HardwareMap hwmap) {
-        servoRight = hwmap.servo.get("servoRight");
-        servoLeft = hwmap.servo.get("servoLeft");
-        bar = hwmap.servo.get("bar");
+        servoRight = hwmap.servo.get("servoRight");//left foundation
+        servoLeft = hwmap.servo.get("servoLeft");//right foundation
         stoneArm = hwmap.servo.get("stoneArm");
         hinge = hwmap.servo.get("hinge");
     }
@@ -100,8 +93,6 @@ public class Robot3939 {
 
         imu.initialize(parameters);
     }
-
-
 
     public void useEncoders(boolean status) {
         if(status) {
@@ -158,8 +149,6 @@ public class Robot3939 {
         RR.setPower(RRpower);
     }
 
-
-
     public void stopMotors() {
         setAllGivenPower(0);
     }
@@ -184,11 +173,9 @@ public class Robot3939 {
         return Math.toDegrees(Math.atan2(angleDirection[1], angleDirection[0]));
     }
 
-
     public static double getHypotenuse(double x, double y) {
         return Math.sqrt(x*x + y*y);
     }
-
 
     public void drive(double LX, double LY, double rotate) {
         if((abs(LX) > minSpeed) || (abs(LY) > minSpeed) || (abs(rotate) > minSpeed)) {
@@ -262,26 +249,12 @@ public class Robot3939 {
         useEncoders(true);
     }
 
-//    public void fineTurn(double LT, double RT) {
-//        if(LT > minSpeed || RT > minSpeed){//we don't have to worry about Range.clip here because the abs values will never exceed 1
-//            FLpower = (-LT + RT)/reduction;
-//            FRpower = (LT - RT)/reduction;
-//            RRpower = (LT - RT)/reduction;
-//            RLpower = (-LT + RT)/reduction;
-//        }
-//        setAllpower();
-//    }
-
     boolean barUp = true;
     boolean aHeld = false;
-    boolean bHeld = false;
     boolean a2Held = false;
     boolean b2Held = false;
-    boolean leftClaw = false;
-    boolean rightClaw = false;
     boolean hingeTurn = false;
     boolean stoneArmGrab = false;
-    boolean xHeld = false;
 
     public boolean slidesDown() {
         if(leftSlides.getPower() == 0 && rightSlides.getPower() == 0)
@@ -289,50 +262,30 @@ public class Robot3939 {
         return false;
     }
 
-    public void leftClawDown() {
+    public void leftServoDown() {
         servoLeft.setPosition(0.33);
-
     }
 
-    public void leftClawUp() {
+    public void leftServoUp() {
         servoLeft.setPosition(0.66);
-
     }
 
-    public void rightClawDown() {
+    public void rightServoDown() {
         servoRight.setPosition(0.32);
     }
 
-    public void rightClawUp() {
+    public void rightServoUp() {
         servoRight.setPosition(0);
     }
 
-    public void setLeftClaw(boolean xPressed) {
-        if (!xHeld && xPressed) {
-            xHeld = true;
-            leftClaw = !leftClaw;
-        } else if (!xPressed)
-            xHeld = false;
-
-        if (leftClaw) //down
-            servoLeft.setPosition(0.33);
-
-        else if(earthIsFlat)//up
-            servoLeft.setPosition(0.66);
-
+    public void foundationDown() {
+        leftServoDown();
+        rightServoDown();
     }
 
-    public void setRightClaw(boolean bPressed) {
-        if (!bHeld && bPressed) {
-            bHeld = true;
-            rightClaw = !rightClaw;
-        } else if (!bPressed)
-            bHeld = false;
-
-        if (rightClaw) //down
-            servoRight.setPosition(0.32);
-        else if(earthIsFlat)//up
-            servoRight.setPosition(0);
+    public void foundationUp() {
+        rightServoUp();
+        leftServoUp();
     }
 
     public void setHinge(boolean b2Pressed) {
@@ -361,14 +314,6 @@ public class Robot3939 {
             stoneArm.setPosition(0.33);
     }
 
-    public void foundationUp() {
-        bar.setPosition(0);
-    }
-
-    public void foundationDown() {
-        bar.setPosition(0.6);//joe
-    }
-
     public void hookFoundation(boolean aPressed) {
         if (!aHeld && aPressed) {
             aHeld = true;
@@ -376,12 +321,10 @@ public class Robot3939 {
         } else if (!aPressed)
             aHeld = false;
 
-        if (barUp) {//if true, set pos to down
-            foundationDown();
-        }
-        else if(earthIsFlat)//else, up
-        {
+        if (barUp) {//up
             foundationUp();
+        } else if(earthIsFlat) {//down
+            foundationDown();
         }
     }
 
@@ -423,7 +366,6 @@ public class Robot3939 {
      * See if we are moving in a straight line and if not return a power correction value.
      * @return Power adjustment, + is adjust left - is adjust right.
      */
-
 
     public double getCorrection(double startAngle, double power)
     {
@@ -477,9 +419,6 @@ public class Robot3939 {
         else
             return;
 
-        // set power to rotate.
-      //  setAllpower();
-
         // rotate until turn is completed.
         if (degrees < 0)
         {
@@ -500,5 +439,4 @@ public class Robot3939 {
         // reset angle tracking on new heading.
         resetAngle();
     }
-
 }

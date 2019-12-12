@@ -67,7 +67,6 @@ public class Holonomic extends LinearOpMode {
         }
     }
 
-
     @Override //when init is pressed
     public void runOpMode() {
         robot.initMotors(hardwareMap);
@@ -86,10 +85,8 @@ public class Holonomic extends LinearOpMode {
 
         while (opModeIsActive()) {
             //forks
-            robot.setRightClaw(gamepad1.b);//pressing a changes fork position, up to down, or vice versa
             robot.hookFoundation(gamepad1.a);//pressing a changes claw position, up to down, or vice versa
             robot.setSpeed(gamepad1.left_bumper, gamepad1.right_bumper);
-            robot.setLeftClaw(gamepad1.x);
 
             robot.setHinge(gamepad2.b);
             robot.setStoneArm(gamepad2.a);
@@ -124,7 +121,6 @@ public class Holonomic extends LinearOpMode {
                         gamepad2.left_stick_y * 0.6,
                         gamepad2.right_stick_x * 0.6);
 
-
                 telemetry.addData("Drive", "Holonomic");
                 //telemetry.addData("Global Heading", robot.getAngle());
                 telemetry.addData("LX", gamepad1.left_stick_x);
@@ -134,7 +130,6 @@ public class Holonomic extends LinearOpMode {
                 telemetry.addData("speed", robot.speed);
                 telemetry.addData("left servo", robot.servoLeft.getPosition());
                 telemetry.addData("right servo", robot.servoRight.getPosition());
-                telemetry.addData("foundationPos", robot.bar.getPosition());
                 telemetry.addData("hinge", robot.hinge.getPosition());
                 telemetry.addData("stoneArm", robot.stoneArm.getPosition());
 

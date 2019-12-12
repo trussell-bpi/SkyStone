@@ -587,54 +587,54 @@ public class REDSkystone extends LinearOpMode {
             if(vals[0] == 0){//middle
                 moveEncoderDifferential(8);
                 strafeGyro(-0.7, 2);
-                robot.leftClawDown();
+                robot.leftServoDown();
                 mySleep(0.5);
                 strafeGyro(0.7, 1);
                 moveEncoderDifferential(50);
-                robot.leftClawUp();
+                robot.leftServoUp();
                 mySleep(0.5);
                 moveEncoderDifferential(-20);//-73
 //                strafeGyro(-0.7, 1);
-//                robot.leftClawDown();
+//                robot.leftServoDown();
 //                mySleep(0.5);
 //                strafeGyro(1, 0.5);
 //                moveEncoderDifferential(90);
-//                robot.leftClawUp();
+//                robot.leftServoUp();
 //                mySleep(0.5);
 //                moveEncoderDifferential(-30);
             } else if(vals[1] == 0) {//left
                 strafeGyro(-0.7, 2);
-                robot.leftClawDown();
+                robot.leftServoDown();
                 mySleep(0.5);
                 strafeGyro(0.7, 1);
                 moveEncoderDifferential(55);
-                robot.leftClawUp();
+                robot.leftServoUp();
                 mySleep(0.5);
                 moveEncoderDifferential(-20);//-73
 //                strafeGyro(-0.7, 1);
-//                robot.leftClawDown();
+//                robot.leftServoDown();
 //                mySleep(0.5);
 //                strafeGyro(1, 0.5);
 //                moveEncoderDifferential(90);
-//                robot.leftClawUp();
+//                robot.leftServoUp();
 //                mySleep(0.5);
 //                moveEncoderDifferential(-30);
             } else {//right
                 moveEncoderDifferential(17);
                 strafeGyro(-0.7, 2);
-                robot.leftClawDown();
+                robot.leftServoDown();
                 mySleep(0.5);
                 strafeGyro(0.7, 1);
                 moveEncoderDifferential(45);
-                robot.leftClawUp();
+                robot.leftServoUp();
                 mySleep(0.5);
                 moveEncoderDifferential(-20);//-73
 //                strafeGyro(-0.7, 1);
-//                robot.leftClawDown();
+//                robot.leftServoDown();
 //                mySleep(0.5);
 //                strafeGyro(1, 0.5);
 //                moveEncoderDifferential(90);
-//                robot.leftClawUp();
+//                robot.leftServoUp();
 //                mySleep(0.5);
 //                moveEncoderDifferential(-30);
             }

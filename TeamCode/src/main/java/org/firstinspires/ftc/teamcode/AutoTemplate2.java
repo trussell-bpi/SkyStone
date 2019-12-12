@@ -554,7 +554,7 @@ public class AutoTemplate2 extends LinearOpMode {
         robot.initServos(hardwareMap);//servo
         robot.initIMU(hardwareMap);//gyro
 
-        detector.setOffset(1.4f/8f, 1.7f/8f);
+        detector.setOffset(-1.4f/8f, 1.7f/8f);
         detector.camSetup(hardwareMap);
 
         robot.useEncoders(true);

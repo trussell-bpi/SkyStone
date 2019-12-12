@@ -67,7 +67,6 @@ public class HolonomicGyro extends LinearOpMode {
         }
     }
 
-
     @Override //when init is pressed
     public void runOpMode() {
         robot.initMotors(hardwareMap);
@@ -89,15 +88,13 @@ public class HolonomicGyro extends LinearOpMode {
 
         while (opModeIsActive()) {
             //forks
-            double LX = gamepad1.left_stick_x, LY = -gamepad1.left_stick_y, RX = gamepad1.right_stick_y;
+            double LX = gamepad1.left_stick_x, LY = -gamepad1.left_stick_y, RX = -gamepad1.right_stick_y;
 
-            robot.setRightClaw(gamepad1.b);//pressing a changes fork position, up to down, or vice versa
             robot.hookFoundation(gamepad1.a);//pressing a changes claw position, up to down, or vice versa
             robot.setSpeed(gamepad1.left_bumper, gamepad1.right_bumper);
-            robot.setLeftClaw(gamepad1.x);
-
             robot.setHinge(gamepad2.b);
             robot.setStoneArm(gamepad2.a);
+
             if (gamepad2.right_bumper)
                 moveSlides(0.5, 20);
             else if (gamepad2.left_bumper)
@@ -109,6 +106,7 @@ public class HolonomicGyro extends LinearOpMode {
                 robot.rightSlides.setPower(0);
             }
 
+            //driver 1 control switch
             if (!yHeld && gamepad1.y) {
                 yHeld = true;
                 driver = !driver;
@@ -116,15 +114,17 @@ public class HolonomicGyro extends LinearOpMode {
                 yHeld = false;
             }
 
+            //driver 2 control switch
             if(!dUpHeld && gamepad2.dpad_up) {
                 dUpHeld = true;
                 driver = !driver;
             } else if(gamepad2.dpad_up)
                 dUpHeld = false;
 
+            //press to switch between Gyro and Normal Drive
             if(!lsbHeld && gamepad1.left_stick_button) {
                 lsbHeld = true;
-                useNormal = false;
+                useNormal = !useNormal;
             } else if(!gamepad1.left_stick_button)
                 lsbHeld = false;
 
@@ -147,7 +147,6 @@ public class HolonomicGyro extends LinearOpMode {
                 robot.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
             }
 
-
             telemetry.addData("Drive", "Holonomic");
             //telemetry.addData("Global Heading", robot.getAngle());
             telemetry.addData("LX", gamepad1.left_stick_x);
@@ -157,7 +156,6 @@ public class HolonomicGyro extends LinearOpMode {
             telemetry.addData("speed", robot.speed);
             telemetry.addData("left servo", robot.servoLeft.getPosition());
             telemetry.addData("right servo", robot.servoRight.getPosition());
-            telemetry.addData("foundationPos", robot.bar.getPosition());
             telemetry.addData("hinge", robot.hinge.getPosition());
             telemetry.addData("stoneArm", robot.stoneArm.getPosition());
 
