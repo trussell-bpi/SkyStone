@@ -88,9 +88,10 @@ public class Holonomic extends LinearOpMode {
             robot.hookFoundation(gamepad1.a);//pressing a changes claw position, up to down, or vice versa
             robot.setSpeed(gamepad1.left_bumper, gamepad1.right_bumper);
 
-            robot.setHinge(gamepad2.b);
+            if(!robot.slidesDown())
+                robot.setHinge(gamepad2.b);
             robot.setStoneArm(gamepad2.a);
-            if (gamepad2.right_bumper)
+            if (gamepad2.right_bumper && !robot.slidesDown())
                 moveSlides(0.5, 20);
             else if (gamepad2.left_bumper)
                 moveSlides(1, -50);

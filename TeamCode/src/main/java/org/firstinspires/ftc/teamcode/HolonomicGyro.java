@@ -76,11 +76,8 @@ public class HolonomicGyro extends LinearOpMode {
         robot.useEncoders(false);//don't need encoders for teleop
         robot.initLinearSlides(hardwareMap);
 
-        boolean driver = true;
         boolean yHeld = false;
-        boolean lsbHeld = false;
         boolean useNormal = true;
-        boolean dUpHeld = false;
         boolean initIMU = true;
 
         waitForStart();
@@ -88,45 +85,34 @@ public class HolonomicGyro extends LinearOpMode {
 
         while (opModeIsActive()) {
             //forks
-            double LX = gamepad1.left_stick_x, LY = -gamepad1.left_stick_y, RX = -gamepad1.right_stick_y;
+            double LX = gamepad1.left_stick_x, LY = -gamepad1.left_stick_y, RX = -gamepad1.right_stick_x;
 
             robot.hookFoundation(gamepad1.a);//pressing a changes claw position, up to down, or vice versa
             robot.setSpeed(gamepad1.left_bumper, gamepad1.right_bumper);
-            robot.setHinge(gamepad2.b);
+            if(!robot.slidesDown())
+                robot.setHinge(gamepad2.b);
             robot.setStoneArm(gamepad2.a);
 
-            if (gamepad2.right_bumper)
+            if (gamepad2.right_bumper && !robot.slidesDown())
                 moveSlides(0.5, 20);
             else if (gamepad2.left_bumper)
                 moveSlides(1, -50);
-            else if (gamepad2.y && robot.slidesDown())
+            else if (gamepad2.dpad_up && robot.slidesDown())
                 moveSlides(1, -225);
-            else if (gamepad2.x) {
+            else if (gamepad2.dpad_down) {
                 robot.leftSlides.setPower(0);
                 robot.rightSlides.setPower(0);
+            } else if(gamepad2.y) {
+                robot.leftSlides.setPower(-0.25);
+                robot.rightSlides.setPower(-0.25);
             }
-
-            //driver 1 control switch
-            if (!yHeld && gamepad1.y) {
-                yHeld = true;
-                driver = !driver;
-            } else if (!gamepad1.y) {
-                yHeld = false;
-            }
-
-            //driver 2 control switch
-            if(!dUpHeld && gamepad2.dpad_up) {
-                dUpHeld = true;
-                driver = !driver;
-            } else if(gamepad2.dpad_up)
-                dUpHeld = false;
 
             //press to switch between Gyro and Normal Drive
-            if(!lsbHeld && gamepad1.left_stick_button) {
-                lsbHeld = true;
+            if(!yHeld && gamepad1.y) {
+                yHeld = true;
                 useNormal = !useNormal;
-            } else if(!gamepad1.left_stick_button)
-                lsbHeld = false;
+            } else if(!gamepad1.y)
+                yHeld = false;
 
             if(!useNormal) {
                 if(initIMU) {
@@ -142,7 +128,7 @@ public class HolonomicGyro extends LinearOpMode {
                 double newLX = coords[0];
                 double newLY = coords[1];
 
-                robot.drive(newLX,newLY,RX);
+                robot.drive(newLX,newLY,-RX);
             } else {
                 robot.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
             }
@@ -151,7 +137,7 @@ public class HolonomicGyro extends LinearOpMode {
             //telemetry.addData("Global Heading", robot.getAngle());
             telemetry.addData("LX", gamepad1.left_stick_x);
             telemetry.addData("LY", gamepad1.left_stick_y);
-            telemetry.addData("RX", gamepad1.right_stick_y);
+            telemetry.addData("RX", gamepad1.right_stick_x);
 
             telemetry.addData("speed", robot.speed);
             telemetry.addData("left servo", robot.servoLeft.getPosition());

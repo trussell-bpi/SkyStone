@@ -43,9 +43,9 @@ public class Robot3939 {
         FR      = hwmap.dcMotor.get("front_right");
 
         RL.setDirection(DcMotorSimple.Direction.FORWARD);
-        FL.setDirection(DcMotorSimple.Direction.REVERSE);
+        FL.setDirection(DcMotorSimple.Direction.FORWARD);
         RR.setDirection(DcMotorSimple.Direction.REVERSE);
-        FR.setDirection(DcMotorSimple.Direction.FORWARD);
+        FR.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void initLinearSlides(HardwareMap hwmap) {
@@ -114,6 +114,15 @@ public class Robot3939 {
         RR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         FR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
+
+    public void RUN_TO_POSITION() {
+        RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+
 
     boolean LTheld = false;
     boolean RTheld = false;
@@ -263,19 +272,19 @@ public class Robot3939 {
     }
 
     public void leftServoDown() {
-        servoLeft.setPosition(0.33);
+        servoLeft.setPosition(0.29);
     }
 
     public void leftServoUp() {
-        servoLeft.setPosition(0.66);
+        servoLeft.setPosition(0.7);
     }
 
     public void rightServoDown() {
-        servoRight.setPosition(0.32);
+        servoRight.setPosition(1);
     }
 
     public void rightServoUp() {
-        servoRight.setPosition(0);
+        servoRight.setPosition(0.5);
     }
 
     public void foundationDown() {
@@ -295,10 +304,10 @@ public class Robot3939 {
         } else if(!b2Pressed)
             b2Held = false;
 
-        if(hingeTurn)//down
+        if(hingeTurn)//work mode
+            hinge.setPosition(0.065);
+        else//home mode
             hinge.setPosition(0.735);
-        else//up
-            hinge.setPosition(0.065 );
     }
 
     public void setStoneArm(boolean a2Pressed) {
