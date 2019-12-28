@@ -24,6 +24,13 @@ public class HolonomicGyro extends LinearOpMode {
 
     public static final boolean earthIsFlat = true;
 
+    public void mySleep(double time) {//seconds
+        runtime.reset();
+        while (opModeIsActive() && (runtime.seconds() < time)) {
+
+        }
+    }
+
     public void moveSlides(double power, int constant) {
         if (opModeIsActive()) {
             robot.leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -59,8 +66,8 @@ public class HolonomicGyro extends LinearOpMode {
             robot.leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-            robot.leftSlides.setPower(-0.25);
-            robot.rightSlides.setPower(-0.25);
+            robot.leftSlides.setPower(-0.4);
+            robot.rightSlides.setPower(-0.4);
             //
 //            robot.leftSlides.setPower(0);
 //            robot.rightSlides.setPower(0);
@@ -77,6 +84,7 @@ public class HolonomicGyro extends LinearOpMode {
         robot.initLinearSlides(hardwareMap);
 
         boolean yHeld = false;
+        boolean y2Held = false;
         boolean useNormal = true;
         boolean initIMU = true;
 
@@ -98,13 +106,21 @@ public class HolonomicGyro extends LinearOpMode {
             else if (gamepad2.left_bumper)
                 moveSlides(1, -50);
             else if (gamepad2.dpad_up && robot.slidesDown())
-                moveSlides(1, -225);
+                moveSlides(1, -220);
             else if (gamepad2.dpad_down) {
                 robot.leftSlides.setPower(0);
                 robot.rightSlides.setPower(0);
-            } else if(gamepad2.y) {
-                robot.leftSlides.setPower(-0.25);
-                robot.rightSlides.setPower(-0.25);
+            }
+
+            //elevate slightly to move stone under bridge
+            if(!y2Held && gamepad2.y) {
+                robot.leftSlides.setPower(-0.4);
+                robot.rightSlides.setPower(-0.4);
+                mySleep(0.1);
+                robot.leftSlides.setPower(-0.3);
+                robot.rightSlides.setPower(-0.3);
+            } else if(!gamepad1.y) {
+                y2Held = false;
             }
 
             //press to switch between Gyro and Normal Drive

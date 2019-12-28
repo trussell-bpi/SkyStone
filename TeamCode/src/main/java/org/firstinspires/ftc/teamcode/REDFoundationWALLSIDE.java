@@ -59,9 +59,9 @@ import pkg3939.skystoneDetectorClass;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="BLUEFoundation", group="skystoe")
+@Autonomous(name="REDFoundationWALLSIDE", group="skystoe")
 //@Disabled
-public class BLUEFoundation extends LinearOpMode {
+public class REDFoundationWALLSIDE extends LinearOpMode {
 
     /* Declare OpMode members. */
     Robot3939 robot = new Robot3939();   // Use a Pushbot's hardware
@@ -490,7 +490,6 @@ public class BLUEFoundation extends LinearOpMode {
 
         }
     }
-
     public void moveDistanceEnc(double power, double distance) {
         robot.stopAndResetEncoders();
 
@@ -729,27 +728,28 @@ public class BLUEFoundation extends LinearOpMode {
         waitForStart();
         if(opModeIsActive()) {
             moveSlides(1, -20);
-            strafeGyro(-1,0.8);
+            strafeGyro(1,0.8);
             moveEncoderDifferential(32, 3);
             robot.foundationDown();
             mySleep(0.3);
-            moveEncoderDifferential(-25, 2.5);//
+            moveEncoderDifferential(-20, 2.5);//
             robot.stopMotors();
-            robot.FL.setPower(1);
-            robot.RL.setPower(1);
+            robot.FR.setPower(1);
+            robot.RR.setPower(1);
             mySleep(1);
             robot.stopMotors();
-            robot.FR.setPower(-1);
-            robot.RR.setPower(-1);
+            robot.FL.setPower(-1);
+            robot.RL.setPower(-1);
             mySleep(1.4);
             robot.stopMotors();
-            strafeGyro(1, 0.4);
+            strafeGyro(-1, 0.4);
             moveEncoderDifferential(13, 2);
             robot.foundationUp();
             mySleep(0.3);
             moveEncoderDifferential(-27, 2.7);
             robot.leftSlides.setPower(0);
             robot.rightSlides.setPower(0);
+            strafeGyro(1, 1);
             moveEncoderDifferential(-18, 2.4);
 
 

@@ -440,7 +440,7 @@ public class REDSky extends LinearOpMode {
                 if (extendSlides) {
                     moveSlides(1, -225);//slides all the up
                     mySleep(0.4);
-                    robot.hinge.setPosition(0.065);//swings hings to work position
+                    robot.hinge.setPosition(0.04);//swings hings to work position
                     robot.stoneArm.setPosition(0.33);
                     //drop the slides all the way down
                     mySleep(1);
@@ -534,7 +534,6 @@ public class REDSky extends LinearOpMode {
             robot.useEncoders(true);
         }
     }
-
 
     public void strafeEnc(double power, double distance) {
         robot.stopAndResetEncoders();
@@ -707,7 +706,7 @@ public class REDSky extends LinearOpMode {
         robot.initIMU(hardwareMap);//gyro
         robot.initLinearSlides(hardwareMap);
 
-        detector.setOffset(-1f/8f, 1.5f/8f);
+        detector.setOffset(0.3f/8f, 1.4f/8f);
         detector.camSetup(hardwareMap);
 
         robot.useEncoders(true);

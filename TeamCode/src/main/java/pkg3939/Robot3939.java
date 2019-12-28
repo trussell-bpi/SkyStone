@@ -305,9 +305,9 @@ public class Robot3939 {
             b2Held = false;
 
         if(hingeTurn)//work mode
-            hinge.setPosition(0.065);
+            hinge.setPosition(0.04);
         else//home mode
-            hinge.setPosition(0.735);
+            hinge.setPosition(0.71);
     }
 
     public void setStoneArm(boolean a2Pressed) {

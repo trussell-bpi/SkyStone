@@ -29,11 +29,15 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import pkg3939.Robot3939;
 import pkg3939.skystoneDetectorClass;
@@ -70,6 +74,7 @@ public class AutoTemplate2 extends LinearOpMode {
     int[] vals;
     private ElapsedTime     runtime = new ElapsedTime();
 
+    private DistanceSensor sensorRange;
     private final double gearRatio = 2/1;//2:1
     private final double ticksPerRev = 537.6 * gearRatio;
     private final double wheelCircumference = 3.1415 * robot.wheelDiameter; //pi * diameter (inches)
@@ -593,38 +598,36 @@ public class AutoTemplate2 extends LinearOpMode {
 //
 //        telemetry.addData("Mode", "waiting for start");
 //        telemetry.addData("imu calib status", robot.imu.getCalibrationStatus().toString());
-        telemetry.addData("Status", "Ready to run");
+        // you can use this as a regular DistanceSensor.
+        sensorRange = hardwareMap.get(DistanceSensor.class, "2Msensor1");
+
+        // you can also cast this to a Rev2mDistanceSensor if you want to use added
+        // methods associated with the Rev2mDistanceSensor class.
+        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)sensorRange;
+
+        telemetry.addData(">>", "Press start to continue");
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        if(opModeIsActive()) {
-            detector.updateVals();
-            vals = detector.getVals();
-            telemetry.addData("Values", vals[1] + "   " + vals[0] + "   " + vals[2]);
-            telemetry.addLine("hi");
+        while(opModeIsActive()) {
+//            detector.updateVals();
+//            vals = detector.getVals();
+//            telemetry.addData("Values", vals[1] + "   " + vals[0] + "   " + vals[2]);
+//            telemetry.addLine("hi");
+//            telemetry.update();
+            telemetry.addData("deviceName",sensorRange.getDeviceName() );
+            telemetry.addData("range", String.format("%.01f mm", sensorRange.getDistance(DistanceUnit.MM)));
+            telemetry.addData("range", String.format("%.01f cm", sensorRange.getDistance(DistanceUnit.CM)));
+            telemetry.addData("range", String.format("%.01f m", sensorRange.getDistance(DistanceUnit.METER)));
+            telemetry.addData("range", String.format("%.01f in", sensorRange.getDistance(DistanceUnit.INCH)));
+
+            // Rev2mDistanceSensor specific methods.
+            telemetry.addData("ID", String.format("%x", sensorTimeOfFlight.getModelID()));
+            telemetry.addData("did time out", Boolean.toString(sensorTimeOfFlight.didTimeoutOccur()));
 
             telemetry.update();
-//
-            moveEncoderDifferential(48);
-            runToAngle(180);
 
-            rotateAngle(0.7, 180, 17.5);
-            moveEncoderDifferential(48);
-            rotateEnc(2000);
-            strafeGyro(-0.8, 1.5);
-            strafeGyro(0.8, 1.5);
-            rotateEnc(4000);
-
-
-            rotateAngle(0.7, 180, 17.5);
-            runToAngle(0);
-            rotateEnc(2000);
-            mySleep(0.5);
-            strafeGyro(0.7,2);
-
-            telemetry.addData("Path", "Complete");
-            telemetry.update();
         }
     }
 }
