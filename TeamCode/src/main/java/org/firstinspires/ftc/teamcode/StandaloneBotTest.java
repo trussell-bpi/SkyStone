@@ -27,7 +27,7 @@ import java.util.Locale;
  * 20 560
  */
 @Autonomous(name= "StandaloneBotTest", group="mecanum autonomous")
-//@Disabled//comment this out to use
+@Disabled//comment this out to use
 public class StandaloneBotTest extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
