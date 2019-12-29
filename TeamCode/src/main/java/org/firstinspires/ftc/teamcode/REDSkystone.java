@@ -59,7 +59,7 @@ import pkg3939.skystoneDetectorClass;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="REDSkystone", group="Pushbot")
+@Autonomous(name="REDSkystone", group="skystoe")
 //@Disabled
 public class REDSkystone extends LinearOpMode {
 
@@ -68,6 +68,7 @@ public class REDSkystone extends LinearOpMode {
 
     skystoneDetectorClass detector = new skystoneDetectorClass();
     int[] vals;
+
     private ElapsedTime     runtime = new ElapsedTime();
 
     private final double gearRatio = 2/1;//2:1
@@ -94,16 +95,16 @@ public class REDSkystone extends LinearOpMode {
 
     }
 
-    public void rotateEnc(int targetTicks) {
+    public void rotateEnc(int targetTicks, double failsafe) {
         double k = 0.0004;
 
         robot.stopAndResetEncoders();
 
         robot.useEncoders(true);
 
-        double tickAvg = (int)((Math.abs(robot.FL.getCurrentPosition()) + Math.abs(robot.FR.getCurrentPosition()) + Math.abs(robot.RL.getCurrentPosition()) + Math.abs(robot.RR.getCurrentPosition()))/4);
+        double tickAvg = robot.FL.getCurrentPosition()/4;
         double tickDifference = targetTicks - tickAvg;
-        double power = Range.clip(k*Math.abs(tickDifference) + 0.2, 0.2, 0.8);
+        double power = Range.clip(k*Math.abs(tickDifference) + 0.2, 0.2, 1);
 
         if(tickDifference < 0)
             power = -power;
@@ -125,6 +126,11 @@ public class REDSkystone extends LinearOpMode {
 
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes
+//                if(runtime.seconds() > failsafe) {//fail safe, in case of infinite loop
+//                    robot.stopMotors();
+//                    break;
+//                }
+
 
                 tickAvg = (int)((Math.abs(robot.FL.getCurrentPosition()) + Math.abs(robot.FR.getCurrentPosition()) + Math.abs(robot.RL.getCurrentPosition()) + Math.abs(robot.RR.getCurrentPosition()))/4);
                 tickDifference = targetTicks - tickAvg;
@@ -155,9 +161,10 @@ public class REDSkystone extends LinearOpMode {
         }
     }
 
-    public void runToAngle(double targetAngle, double threshold) {
+    public void runToAngle(int targetAngle) {
+        double k = 0.004;
         double angleDifference = targetAngle - robot.getAngle();
-        double power = Range.clip(0.005*Math.abs(angleDifference) + 0.2, 0.2, 1);
+        double power = Range.clip(k*Math.abs(angleDifference) + 0.2, 0.2, 1);
 
         if(angleDifference < 0)
             power = -power;
@@ -174,7 +181,7 @@ public class REDSkystone extends LinearOpMode {
         runtime.reset();
         while (opModeIsActive() && run) {
             angleDifference = targetAngle - robot.getAngle();
-            power = Range.clip(0.005*Math.abs(angleDifference) + 0.2, 0.2, 1);
+            power = Range.clip(k*Math.abs(angleDifference) + 0.2, 0.2, 1);
             if(angleDifference < 0)
                 power = -power;
 
@@ -185,7 +192,7 @@ public class REDSkystone extends LinearOpMode {
             telemetry.addData("angle difference", angleDifference);
             telemetry.addData("power", robot.FL.getPower());
             telemetry.update();
-            if(robot.getAngle() == targetAngle)
+            if(Math.round(robot.getAngle()) == targetAngle)
                 run = false;
             if(runtime.seconds() > 2)
                 run = false;
@@ -327,22 +334,21 @@ public class REDSkystone extends LinearOpMode {
 
     }
 
-    public void moveEncoderDifferential(double distance) {
-        double k = 0.0004;
-
-        robot.stopAndResetEncoders();
-
-        robot.useEncoders(true);
-
+    public void moveEncoderDifferential(double distance, double failsafe) {
+        double k = 0.0005;
+        double minSpeed = 0.2;
+        double startSpeed = 0.5;
         double rotations = distance/ wheelCircumference; //distance / circumference (inches)
         int targetTicks = (int)(rotations*ticksPerRev);
+        int currentTickAvg = (robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4;
+        double tickDifference = targetTicks - currentTickAvg;
+        double power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, startSpeed);
 
-        double tickAvg = (int)((Math.abs(robot.FL.getCurrentPosition()) + Math.abs(robot.FR.getCurrentPosition()) + Math.abs(robot.RL.getCurrentPosition()) + Math.abs(robot.RR.getCurrentPosition()))/4.0);
-        double tickDifference = targetTicks - tickAvg;
-        double power = Range.clip(k*Math.abs(tickDifference) + 0.2, 0.2, 0.8);
+//        if(tickDifference < 0)
+//            power = -power;
 
-        if(distance < 0)
-            power = -power;
+        robot.stopAndResetEncoders();
+        robot.useEncoders(true);
 
         if(opModeIsActive()) {
             robot.RL.setTargetPosition(targetTicks);
@@ -350,24 +356,30 @@ public class REDSkystone extends LinearOpMode {
             robot.FL.setTargetPosition(targetTicks);
             robot.FR.setTargetPosition(targetTicks);
 
-            robot.RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.RUN_TO_POSITION();
 
-            robot.setAllGivenPower(power);
+            robot.setAllGivenPower(power);//sets all motors to the given power
 
             double startAngle = robot.getAngle();
+            runtime.reset();
 
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes
 
-                tickAvg = (int)((Math.abs(robot.FL.getCurrentPosition()) + Math.abs(robot.FR.getCurrentPosition()) + Math.abs(robot.RL.getCurrentPosition()) + Math.abs(robot.RR.getCurrentPosition()))/4.0);
-                tickDifference = targetTicks - tickAvg;
-                power = Range.clip(k*Math.abs(tickDifference) + 0.2, 0.2, 0.8);
+                if(runtime.seconds() > failsafe)//fail safe, in case of infinite loop
+                    break;
 
-                if(tickDifference < 0)
-                    power = -power;
+
+                currentTickAvg = (int)((robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4.0);
+                tickDifference = targetTicks - currentTickAvg;
+
+                if(runtime.seconds() < 0.3)
+                    power = startSpeed;
+                else
+                    power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, 1);
+
+//                if(tickDifference < 0)
+//                    power = -power;
 //                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
 //                robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
 //                robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
@@ -376,23 +388,127 @@ public class REDSkystone extends LinearOpMode {
 
                 robot.setAllGivenPower(power);
 
-                telemetry.addData("Ticks target", targetTicks);
-                telemetry.addData("distance target", distance);
-
+                telemetry.addData("Path", "Driving "+distance+" inches");
+                telemetry.addData("target ticks", targetTicks);
+                telemetry.addData("tick Avg", currentTickAvg);
                 telemetry.addData("tickDifference", tickDifference);
                 telemetry.addData("power", power);
+                telemetry.addData("FL ticks", robot.FL.getCurrentPosition());
+                telemetry.addData("FR ticks", robot.FR.getCurrentPosition());
+                telemetry.addData("RR ticks", robot.RR.getCurrentPosition());
+                telemetry.addData("RL ticks", robot.RL.getCurrentPosition());
+                telemetry.addData("timer", (int)runtime.seconds());
                 telemetry.update();
             }
-
             robot.stopMotors();
+            robot.useEncoders(true);
 
             telemetry.addData("Path", "Complete");
             telemetry.update();
 
-            robot.useEncoders(true);
         }
     }
 
+    public void moveEncoderDifferentialWhileExtendingSlides(double distance, int slideTicks) {
+        double k = 0.0005;
+        double minSpeed = 0.2;
+        double startSpeed = 0.5;
+        double rotations = distance/ wheelCircumference; //distance / circumference (inches)
+        int targetTicks = (int)(rotations*ticksPerRev);
+        int currentTickAvg = (robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4;
+        double tickDifference = targetTicks - currentTickAvg;
+        double power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, startSpeed);
+
+        robot.stopAndResetEncoders();
+        robot.useEncoders(true);
+
+        if(opModeIsActive()) {
+            robot.RL.setTargetPosition(targetTicks);
+            robot.RR.setTargetPosition(targetTicks);
+            robot.FL.setTargetPosition(targetTicks);
+            robot.FR.setTargetPosition(targetTicks);
+
+            //all run to position
+            robot.RUN_TO_POSITION();
+            robot.leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+            robot.setAllGivenPower(power);//sets all motors to the given power
+            robot.leftSlides.setPower(-1);
+            robot.rightSlides.setPower(-1);
+
+
+            double startAngle = robot.getAngle();
+            boolean hold = true;
+            runtime.reset();
+
+            while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy() || robot.leftSlides.isBusy() || robot.rightSlides.isBusy()) {
+                //wait till motor finishes
+                if(runtime.seconds() > 1.2 && hold) {
+                    robot.leftSlides.setPower(0);
+                    robot.rightSlides.setPower(0);
+
+                    robot.hinge.setPosition(0.04);
+
+                    robot.leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    robot.rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+                    hold = false;
+                }
+
+                if(runtime.seconds() > 5)//fail safe, in case of infinite loop
+                    break;
+
+
+                currentTickAvg = (int)((robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4.0);
+                tickDifference = targetTicks - currentTickAvg;
+
+                if(runtime.seconds() < 0.3)
+                    power = startSpeed;
+                else
+                    power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, 1);
+
+//                if(tickDifference < 0)
+//                    power = -power;
+//                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
+//                robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.RL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+
+                robot.setAllGivenPower(power);
+
+                telemetry.addData("Path", "Driving "+distance+" inches");
+                telemetry.addData("target ticks", targetTicks);
+                telemetry.addData("tick Avg", currentTickAvg);
+                telemetry.addData("tickDifference", tickDifference);
+                telemetry.addData("power", power);
+                telemetry.addData("FL ticks", robot.FL.getCurrentPosition());
+                telemetry.addData("FR ticks", robot.FR.getCurrentPosition());
+                telemetry.addData("RR ticks", robot.RR.getCurrentPosition());
+                telemetry.addData("RL ticks", robot.RL.getCurrentPosition());
+                telemetry.addData("timer", (int)runtime.seconds());
+                telemetry.update();
+            }
+
+            robot.leftSlides.setPower(0);
+            robot.rightSlides.setPower(0);
+
+            robot.leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            robot.leftSlides.setPower(-0.3);
+            robot.rightSlides.setPower(-0.3);
+
+            robot.stopMotors();
+            robot.useEncoders(true);
+
+            telemetry.addData("Path", "Complete");
+            telemetry.update();
+
+        }
+    }
     public void moveDistanceEnc(double power, double distance) {
         robot.stopAndResetEncoders();
 
@@ -438,7 +554,6 @@ public class REDSkystone extends LinearOpMode {
         }
     }
 
-
     public void strafeEnc(double power, double distance) {
         robot.stopAndResetEncoders();
 
@@ -464,7 +579,7 @@ public class REDSkystone extends LinearOpMode {
 
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes working
-                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
+                double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
                 robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
                 robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
                 robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
@@ -484,9 +599,10 @@ public class REDSkystone extends LinearOpMode {
 
     public void strafeEncoderDifferential(double distance) {
         double k = 0.0004;
+        double minSpeed = 0.2;
+        double startSpeed = 0.6;
 
         robot.stopAndResetEncoders();
-
         robot.useEncoders(true);
 
         double rotations = distance/ wheelCircumference; //distance / circumference (inches)
@@ -494,7 +610,7 @@ public class REDSkystone extends LinearOpMode {
 
         double tickAvg = (int)((robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4);
         double tickDifference = targetTicks - tickAvg;
-        double power = Range.clip(k*Math.abs(tickDifference) + 0.1, 0.1, 1);
+        double power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, startSpeed);
 
         if(tickDifference < 0)
             power = -power;
@@ -517,12 +633,20 @@ public class REDSkystone extends LinearOpMode {
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes
 
+                if(runtime.seconds() > 5)//fail safe, in case of infinite loop
+                    break;
+
+
                 tickAvg = (int)((Math.abs(robot.FL.getCurrentPosition()) + Math.abs(robot.FR.getCurrentPosition()) + Math.abs(robot.RL.getCurrentPosition()) + Math.abs(robot.RR.getCurrentPosition()))/4.0);
                 tickDifference = targetTicks - tickAvg;
-                power = Range.clip(k*Math.abs(tickDifference) + 0.1, 0.1, 1);
 
-                if(tickDifference < 0)
-                    power = -power;
+                if(runtime.seconds() < 0.3)
+                    power = startSpeed;
+                else
+                    power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, 1);
+
+
+
 //                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
 //                robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
 //                robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
@@ -538,11 +662,55 @@ public class REDSkystone extends LinearOpMode {
             }
 
             robot.stopMotors();
+            mySleep(0.5);
 
             telemetry.addData("Path", "Complete");
             telemetry.update();
 
             robot.useEncoders(true);
+        }
+    }
+
+    public void moveSlides(double power, int constant) {
+        if (opModeIsActive()) {
+            robot.leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            robot.leftSlides.setTargetPosition(robot.leftSlides.getCurrentPosition() + constant);
+            robot.rightSlides.setTargetPosition(robot.rightSlides.getCurrentPosition() + constant);
+
+            robot.leftSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            robot.leftSlides.setPower(power);
+            robot.rightSlides.setPower(power);
+
+            runtime.reset();
+
+            while (robot.leftSlides.isBusy() || robot.rightSlides.isBusy()) {
+                //wait till motor finishes working
+                robot.drive(gamepad1.left_stick_x,
+                        gamepad1.left_stick_y,
+                        gamepad1.right_stick_x);
+                telemetry.addLine("Slides Extending");
+                telemetry.update();
+                if (runtime.seconds() > 1.2)
+                    break;
+            }
+            telemetry.addLine("Extended");
+            telemetry.update();
+
+            robot.leftSlides.setPower(0);
+            robot.rightSlides.setPower(0);
+
+            robot.leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            robot.leftSlides.setPower(-0.25);
+            robot.rightSlides.setPower(-0.25);
+            //
+//            robot.leftSlides.setPower(0);
+//            robot.rightSlides.setPower(0);
         }
     }
 
@@ -555,8 +723,9 @@ public class REDSkystone extends LinearOpMode {
         robot.initMotors(hardwareMap);
         robot.initServos(hardwareMap);//servo
         robot.initIMU(hardwareMap);//gyro
+        robot.initLinearSlides(hardwareMap);
 
-        detector.setOffset(1.0f/8f, 1.7f/8f);
+        detector.setOffset(-0.3f/8f, 1.5f/8f);
         detector.camSetup(hardwareMap);
 
         robot.useEncoders(true);
@@ -580,68 +749,89 @@ public class REDSkystone extends LinearOpMode {
             detector.updateVals();
             vals = detector.getVals();
             telemetry.addData("Values", vals[1] + "   " + vals[0] + "   " + vals[2]);
-            telemetry.addLine("hi");
-
             telemetry.update();
+
+
+            robot.foundationUp();
+            moveSlides(1, -180);
+            robot.stoneArm.setPosition(0.33);
+            robot.hinge.setPosition(0.71);
+            mySleep(0.75);
+            robot.leftSlides.setPower(0);
+            robot.rightSlides.setPower(0);
+
 
             if(vals[0] == 0){//middle
-                moveEncoderDifferential(8);
-                strafeGyro(-0.7, 2);
-                robot.leftServoDown();
-                mySleep(0.5);
-                strafeGyro(0.7, 1);
-                moveEncoderDifferential(50);
-                robot.leftServoUp();
-                mySleep(0.5);
-                moveEncoderDifferential(-20);//-73
-//                strafeGyro(-0.7, 1);
-//                robot.leftServoDown();
-//                mySleep(0.5);
-//                strafeGyro(1, 0.5);
-//                moveEncoderDifferential(90);
-//                robot.leftServoUp();
-//                mySleep(0.5);
-//                moveEncoderDifferential(-30);
+                moveEncoderDifferential(32, 1.8);
             } else if(vals[1] == 0) {//left
-                strafeGyro(-0.7, 2);
-                robot.leftServoDown();
-                mySleep(0.5);
-                strafeGyro(0.7, 1);
-                moveEncoderDifferential(55);
-                robot.leftServoUp();
-                mySleep(0.5);
-                moveEncoderDifferential(-20);//-73
-//                strafeGyro(-0.7, 1);
-//                robot.leftServoDown();
-//                mySleep(0.5);
-//                strafeGyro(1, 0.5);
-//                moveEncoderDifferential(90);
-//                robot.leftServoUp();
-//                mySleep(0.5);
-//                moveEncoderDifferential(-30);
+                strafeGyro(-1, 0.45);
+                moveEncoderDifferential(32, 1.8);
             } else {//right
-                moveEncoderDifferential(17);
-                strafeGyro(-0.7, 2);
-                robot.leftServoDown();
-                mySleep(0.5);
-                strafeGyro(0.7, 1);
-                moveEncoderDifferential(45);
-                robot.leftServoUp();
-                mySleep(0.5);
-                moveEncoderDifferential(-20);//-73
-//                strafeGyro(-0.7, 1);
-//                robot.leftServoDown();
-//                mySleep(0.5);
-//                strafeGyro(1, 0.5);
-//                moveEncoderDifferential(90);
-//                robot.leftServoUp();
-//                mySleep(0.5);
-//                moveEncoderDifferential(-30);
+                strafeGyro(1, 0.45);
+                moveEncoderDifferential(32, 1.8 );
             }
 
+//            //-0.3 = hold
+//            //-0.4 = slowly up without stone
+//            //-0.45 = slowly up WITH stone
+//
+            mySleep(0.1);
+            robot.stoneArm.setPosition(0.03);
+            mySleep(0.3);
+            robot.leftSlides.setPower(-0.6);
+            robot.rightSlides.setPower(-0.6);
+            mySleep(0.1);
+            robot.leftSlides.setPower(-0.3);
+            robot.rightSlides.setPower(-0.3);
+            moveEncoderDifferential(-6, 0.8);
+            rotateEnc(-1960, 1);//rotate right
 
-            telemetry.addData("Path", "Complete");
-            telemetry.update();
+            if(vals[0] == 0){//middle
+                moveEncoderDifferential(65, 2.7);//run to foundation side
+            } else if(vals[1] == 0) {//left
+                moveEncoderDifferential(75, 3);//run to foundation side
+            } else {//right
+                moveEncoderDifferential(60, 2.5);//run to foundation side
+            }
+
+            robot.stoneArm.setPosition(0.33);//let go stone
+
+            if(vals[0] == 0){//middle
+                moveEncoderDifferential(-85, 2.7);//run to foundation side
+            } else if(vals[1] == 0) {//left
+                moveEncoderDifferential(-95, 3);//run to foundation side
+            } else {//right
+                moveEncoderDifferential(-80, 2.5);//run to foundation side
+            }
+
+            rotateEnc(1960, 1);//rotate left
+            moveEncoderDifferential(8, 1);
+            robot.leftSlides.setPower(0);
+            robot.rightSlides.setPower(0);//drop slides
+            mySleep(0.1);
+            robot.stoneArm.setPosition(0.03);//grab stone
+            mySleep(0.3);
+            robot.leftSlides.setPower(-0.6);
+            robot.rightSlides.setPower(-0.6);
+            mySleep(0.1);
+            robot.leftSlides.setPower(-0.3);
+            robot.rightSlides.setPower(-0.3);
+            moveEncoderDifferential(-6, 0.8);
+            rotateEnc(-1960, 1);//rotate right
+
+            if(vals[0] == 0){//middle
+                moveEncoderDifferential(85, 2.7);//run to foundation side
+            } else if(vals[1] == 0) {//left
+                moveEncoderDifferential(95, 3);//run to foundation side
+            } else {//right
+                moveEncoderDifferential(80, 2.5);//run to foundation side
+            }
+            robot.stoneArm.setPosition(0.33);//let go stone
+            mySleep(0.3);
+            moveEncoderDifferential(-10, 1.5);
+            robot.leftSlides.setPower(0);
+            robot.rightSlides.setPower(0);
+
         }
     }
 }

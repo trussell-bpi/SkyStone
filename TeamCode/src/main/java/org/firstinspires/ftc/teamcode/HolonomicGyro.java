@@ -114,8 +114,8 @@ public class HolonomicGyro extends LinearOpMode {
 
             //elevate slightly to move stone under bridge
             if(!y2Held && gamepad2.y) {
-                robot.leftSlides.setPower(-0.4);
-                robot.rightSlides.setPower(-0.4);
+                robot.leftSlides.setPower(-0.6);
+                robot.rightSlides.setPower(-0.6);
                 mySleep(0.1);
                 robot.leftSlides.setPower(-0.3);
                 robot.rightSlides.setPower(-0.3);

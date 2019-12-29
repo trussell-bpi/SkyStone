@@ -17,7 +17,7 @@ import static java.lang.Math.abs;
  */
 
 @TeleOp(name="TeleOpMecanum", group="Iterative Opmode")
-//@Disabled
+@Disabled
 public class TeleOpMecanum extends OpMode {
     private ElapsedTime runtime = new ElapsedTime();
 

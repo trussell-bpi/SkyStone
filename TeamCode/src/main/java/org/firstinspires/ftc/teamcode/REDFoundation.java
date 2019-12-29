@@ -59,11 +59,7 @@ import pkg3939.skystoneDetectorClass;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-<<<<<<< HEAD
 @Autonomous(name="REDFoundation", group="skystoe")
-=======
-@Autonomous(name="REDSkyWithFoundation", group="skystoe")
->>>>>>> acd1e4127b52571afd1782e71bb84ad2d94f470d
 //@Disabled
 public class REDFoundation extends LinearOpMode {
 
@@ -333,11 +329,7 @@ public class REDFoundation extends LinearOpMode {
 
     }
 
-<<<<<<< HEAD
     public void moveEncoderDifferential(double distance, double failsafe) {
-=======
-    public void moveEncoderDifferential(double distance) {
->>>>>>> acd1e4127b52571afd1782e71bb84ad2d94f470d
         double k = 0.0005;
         double minSpeed = 0.2;
         double startSpeed = 0.5;
@@ -369,11 +361,7 @@ public class REDFoundation extends LinearOpMode {
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes
 
-<<<<<<< HEAD
                 if(runtime.seconds() > failsafe)//fail safe, in case of infinite loop
-=======
-                if(runtime.seconds() > 5)//fail safe, in case of infinite loop
->>>>>>> acd1e4127b52571afd1782e71bb84ad2d94f470d
                     break;
 
 
@@ -416,11 +404,7 @@ public class REDFoundation extends LinearOpMode {
         }
     }
 
-<<<<<<< HEAD
     public void moveEncoderDifferentialWhileExtendingSlides(double distance) {
-=======
-    public void moveEncoderDifferentialWhileExtendingSlides(double distance, int slideTicks) {
->>>>>>> acd1e4127b52571afd1782e71bb84ad2d94f470d
         double k = 0.0005;
         double minSpeed = 0.2;
         double startSpeed = 0.5;
@@ -429,15 +413,11 @@ public class REDFoundation extends LinearOpMode {
         int currentTickAvg = (robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4;
         double tickDifference = targetTicks - currentTickAvg;
         double power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, startSpeed);
-<<<<<<< HEAD
         boolean extendSlides = true;
 
 //        if(tickDifference < 0)
 //            power = -power;
 
-=======
-
->>>>>>> acd1e4127b52571afd1782e71bb84ad2d94f470d
         robot.stopAndResetEncoders();
         robot.useEncoders(true);
 
@@ -446,31 +426,17 @@ public class REDFoundation extends LinearOpMode {
             robot.RR.setTargetPosition(targetTicks);
             robot.FL.setTargetPosition(targetTicks);
             robot.FR.setTargetPosition(targetTicks);
-            robot.leftSlides.setTargetPosition(slideTicks);
-            robot.rightSlides.setTargetPosition(slideTicks);
 
             robot.RUN_TO_POSITION();
-<<<<<<< HEAD
 
             robot.setAllGivenPower(power);//sets all motors to the given power
-=======
-            robot.leftSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.rightSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-
-            robot.setAllGivenPower(power);//sets all motors to the given power
-            robot.leftSlides.setPower(1);
-            robot.rightSlides.setPower(1);
-
->>>>>>> acd1e4127b52571afd1782e71bb84ad2d94f470d
 
             double startAngle = robot.getAngle();
             runtime.reset();
 
-            while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy() || robot.leftSlides.isBusy() || robot.rightSlides.isBusy()) {
+            while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes
 
-<<<<<<< HEAD
                 if (extendSlides) {
                     moveSlides(1, -225);//slides all the up
                     mySleep(0.4);
@@ -482,8 +448,6 @@ public class REDFoundation extends LinearOpMode {
                     robot.rightSlides.setPower(0);
                     extendSlides = false;
                 }
-=======
->>>>>>> acd1e4127b52571afd1782e71bb84ad2d94f470d
                 if(runtime.seconds() > 5)//fail safe, in case of infinite loop
                     break;
 
@@ -518,19 +482,6 @@ public class REDFoundation extends LinearOpMode {
                 telemetry.addData("timer", (int)runtime.seconds());
                 telemetry.update();
             }
-<<<<<<< HEAD
-=======
-
-            robot.leftSlides.setPower(0);
-            robot.rightSlides.setPower(0);
-
-            robot.leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-            robot.leftSlides.setPower(-0.3);
-            robot.rightSlides.setPower(-0.3);
-
->>>>>>> acd1e4127b52571afd1782e71bb84ad2d94f470d
             robot.stopMotors();
             robot.useEncoders(true);
 
@@ -609,7 +560,7 @@ public class REDFoundation extends LinearOpMode {
 
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes working
-                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
+                double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
                 robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
                 robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
                 robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
@@ -776,30 +727,30 @@ public class REDFoundation extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         if(opModeIsActive()) {
-<<<<<<< HEAD
-            moveSlides(1, -20);
-            strafeGyro(1,0.8);
-            moveEncoderDifferential(32, 3);
-            robot.foundationDown();
+            robot.foundationUp();//init foundation hooks up
+            moveSlides(1, -20);//extend slides slightly to avoid drag
+            strafeGyro(1,0.8);//strafe right
+            moveEncoderDifferential(32, 3);//move forward until touching foundation
+            robot.foundationDown();//lower foundation hooks
             mySleep(0.3);
-            moveEncoderDifferential(-20, 2.5);//
-            robot.stopMotors();
-            robot.FR.setPower(1);
+            moveEncoderDifferential(-20, 2.5);//drag back a little
+            robot.stopMotors();//
+            robot.FR.setPower(1);//push left side of robot forward
             robot.RR.setPower(1);
             mySleep(1);
             robot.stopMotors();
-            robot.FL.setPower(-1);
+            robot.FL.setPower(-1);//pull right side of the robot back
             robot.RL.setPower(-1);
             mySleep(1.4);
             robot.stopMotors();
-            strafeGyro(-1, 0.4);
-            moveEncoderDifferential(13, 2);
-            robot.foundationUp();
+            strafeGyro(-1, 0.4);//strafe left to align with middle of foundation
+            moveEncoderDifferential(13, 2);//push forward to align with wall
+            robot.foundationUp();//release foundation
             mySleep(0.3);
-            moveEncoderDifferential(-27, 2.7);
+            moveEncoderDifferential(-27, 2.7);//move straight back towards parking spot
             robot.leftSlides.setPower(0);
-            robot.rightSlides.setPower(0);
-            moveEncoderDifferential(-18, 2.4);
+            robot.rightSlides.setPower(0);//release slides because going under bridge
+            moveEncoderDifferential(-18, 2.4);//move under bridge.
 
 
             telemetry.addData("FR", robot.FR.getPower());
@@ -812,37 +763,6 @@ public class REDFoundation extends LinearOpMode {
             telemetry.addData("hinge", robot.hinge.getPosition());
             telemetry.addData("stoneArm", robot.stoneArm.getPosition());
 
-=======
-
-            //starting on red foundation site
-            robot.foundationUp();
-
-            //move foundation
-            //.................................................
-            moveSlides(1, -100);//raise slides
-            //align robot with foundation
-            robot.useEncoders(true);
-            moveEncoderDifferential(50);
-            mySleep(0.2);
-            robot.useEncoders(false);
-            robot.foundationDown();
-            mySleep(0.2);
-            robot.FR.setPower(-0.5);
-            robot.RR.setPower(-0.5);//power only right side of robot backwards, to rotate foundation. \
-            mySleep(3);
-            robot.setAllGivenPower(0.8);//push against the wall
-            mySleep(1);
-            robot.foundationUp();
-            mySleep(0.3);
-            //....................................................
-            moveEncoderDifferential(-40);//park at midfield
-
-            telemetry.addData("left servo", robot.servoLeft.getPosition());
-            telemetry.addData("right servo", robot.servoRight.getPosition());
-            telemetry.addData("hinge", robot.hinge.getPosition());
-            telemetry.addData("stoneArm", robot.stoneArm.getPosition());
-
->>>>>>> acd1e4127b52571afd1782e71bb84ad2d94f470d
             telemetry.update();
             while(opModeIsActive()) {
 

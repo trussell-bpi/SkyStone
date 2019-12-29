@@ -95,7 +95,7 @@ public class REDSkyWithFoundation extends LinearOpMode {
 
     }
 
-    public void rotateEnc(int targetTicks) {
+    public void rotateEnc(int targetTicks, double failsafe) {
         double k = 0.0004;
 
         robot.stopAndResetEncoders();
@@ -126,6 +126,11 @@ public class REDSkyWithFoundation extends LinearOpMode {
 
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes
+//                if(runtime.seconds() > failsafe) {//fail safe, in case of infinite loop
+//                    robot.stopMotors();
+//                    break;
+//                }
+
 
                 tickAvg = (int)((Math.abs(robot.FL.getCurrentPosition()) + Math.abs(robot.FR.getCurrentPosition()) + Math.abs(robot.RL.getCurrentPosition()) + Math.abs(robot.RR.getCurrentPosition()))/4);
                 tickDifference = targetTicks - tickAvg;
@@ -329,7 +334,7 @@ public class REDSkyWithFoundation extends LinearOpMode {
 
     }
 
-    public void moveEncoderDifferential(double distance) {
+    public void moveEncoderDifferential(double distance, double failsafe) {
         double k = 0.0005;
         double minSpeed = 0.2;
         double startSpeed = 0.5;
@@ -361,7 +366,7 @@ public class REDSkyWithFoundation extends LinearOpMode {
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes
 
-                if(runtime.seconds() > 5)//fail safe, in case of infinite loop
+                if(runtime.seconds() > failsafe)//fail safe, in case of infinite loop
                     break;
 
 
@@ -422,39 +427,36 @@ public class REDSkyWithFoundation extends LinearOpMode {
             robot.RR.setTargetPosition(targetTicks);
             robot.FL.setTargetPosition(targetTicks);
             robot.FR.setTargetPosition(targetTicks);
-            robot.leftSlides.setTargetPosition(slideTicks);
-            robot.rightSlides.setTargetPosition(slideTicks);
 
+            //all run to position
             robot.RUN_TO_POSITION();
-            robot.leftSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.rightSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
             robot.setAllGivenPower(power);//sets all motors to the given power
-            robot.leftSlides.setPower(1);
-            robot.rightSlides.setPower(1);
+            robot.leftSlides.setPower(-1);
+            robot.rightSlides.setPower(-1);
 
 
             double startAngle = robot.getAngle();
+            boolean hold = true;
             runtime.reset();
 
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy() || robot.leftSlides.isBusy() || robot.rightSlides.isBusy()) {
                 //wait till motor finishes
-
-<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/REDSky.java
-                if (extendSlides) {
-                    moveSlides(1, -225);//slides all the up
-                    mySleep(0.4);
-                    robot.hinge.setPosition(0.04);//swings hings to work position
-                    robot.stoneArm.setPosition(0.33);
-                    //drop the slides all the way down
-                    mySleep(1);
+                if(runtime.seconds() > 1.2 && hold) {
                     robot.leftSlides.setPower(0);
                     robot.rightSlides.setPower(0);
-                    extendSlides = false;
+
+                    robot.hinge.setPosition(0.04);
+
+                    robot.leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    robot.rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+                    hold = false;
                 }
-=======
->>>>>>> acd1e4127b52571afd1782e71bb84ad2d94f470d:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/REDSkyWithFoundation.java
+
                 if(runtime.seconds() > 5)//fail safe, in case of infinite loop
                     break;
 
@@ -577,7 +579,7 @@ public class REDSkyWithFoundation extends LinearOpMode {
 
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes working
-                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
+                double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
                 robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
                 robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
                 robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
@@ -723,7 +725,7 @@ public class REDSkyWithFoundation extends LinearOpMode {
         robot.initIMU(hardwareMap);//gyro
         robot.initLinearSlides(hardwareMap);
 
-        detector.setOffset(0.3f/8f, 1.4f/8f);
+        detector.setOffset(-0.3f/8f, 1.5f/8f);
         detector.camSetup(hardwareMap);
 
         robot.useEncoders(true);
@@ -749,72 +751,114 @@ public class REDSkyWithFoundation extends LinearOpMode {
             telemetry.addData("Values", vals[1] + "   " + vals[0] + "   " + vals[2]);
             telemetry.update();
 
+
             robot.foundationUp();
+            moveSlides(1, -180);
+            robot.hinge.setPosition(0.71);
+            robot.stoneArm.setPosition(0.33);
+            mySleep(0.75);
+            robot.leftSlides.setPower(0);
+            robot.rightSlides.setPower(0);
 
 
             if(vals[0] == 0){//middle
-                moveEncoderDifferentialWhileExtendingSlides(30, -225);
+                moveEncoderDifferential(32, 1.8);
             } else if(vals[1] == 0) {//left
-                strafeGyro(-0.7, 2);
-                moveEncoderDifferentialWhileExtendingSlides(30, -225);
+                strafeGyro(-1, 0.45);
+                moveEncoderDifferential(32, 1.8);
             } else {//right
-                strafeGyro(0.7, 2);
-                moveEncoderDifferentialWhileExtendingSlides(30, -225);
+                strafeGyro(1, 0.45);
+                moveEncoderDifferential(32, 1.8 );
             }
 
-            //-0.3 = hold
-            //-0.4 = slowly up without stone
-            //-0.45 = slowly up WITH stone
-
+//            //-0.3 = hold
+//            //-0.4 = slowly up without stone
+//            //-0.45 = slowly up WITH stone
+//
             mySleep(0.1);
             robot.stoneArm.setPosition(0.03);
             mySleep(0.3);
-            robot.leftSlides.setPower(-0.4);
-            robot.rightSlides.setPower(-0.4);
+            robot.leftSlides.setPower(-0.6);
+            robot.rightSlides.setPower(-0.6);
             mySleep(0.1);
             robot.leftSlides.setPower(-0.3);
             robot.rightSlides.setPower(-0.3);
-            moveEncoderDifferential(-6);
-            rotateEnc(-1950);
-            moveEncoderDifferential(85);//run to foundation side
-            robot.leftSlides.setPower(-0.4);
-            robot.rightSlides.setPower(-0.4);
-            rotateEnc(1950);
-            moveEncoderDifferential(8);
-            robot.leftSlides.setPower(0);
-            robot.rightSlides.setPower(0);//drop slides
-            robot.stoneArm.setPosition(0.33);//release stone
+            moveEncoderDifferential(-6, 0.8);
+            rotateEnc(-1960, 1);
 
-
-            //move foundation
-            //.................................................
-            moveSlides(1, -100);//raise slides
-            //align robot with foundation
-            robot.useEncoders(false);
-            robot.setAllGivenPower(0.3);
-            mySleep(0.4);
-            robot.stopMotors();
-            robot.foundationDown();
-            mySleep(0.2);
-            robot.FR.setPower(-0.5);
-            robot.RR.setPower(-0.5);//power only right side of robot backwards, to rotate foundation. \
-            mySleep(3);
-            robot.setAllGivenPower(0.8);//push against the wall
-            mySleep(1);
-            robot.foundationUp();
-            mySleep(0.3);
-            //....................................................
-            moveEncoderDifferential(-40);
-
-            telemetry.addData("left servo", robot.servoLeft.getPosition());
-            telemetry.addData("right servo", robot.servoRight.getPosition());
-            telemetry.addData("hinge", robot.hinge.getPosition());
-            telemetry.addData("stoneArm", robot.stoneArm.getPosition());
-
-            telemetry.update();
-            while(opModeIsActive()) {
-
+            if(vals[0] == 0){//middle
+                moveEncoderDifferential(85, 3.3);//run to foundation side
+            } else if(vals[1] == 0) {//left
+                moveEncoderDifferential(95, 3.5);//run to foundation side
+            } else {//right
+                moveEncoderDifferential(80, 3.1);//run to foundation side
             }
+            robot.leftSlides.setPower(-0.6);
+            robot.rightSlides.setPower(-0.6);
+            rotateEnc(1960, 1.6);
+            moveEncoderDifferential(7.5, 2);
+            robot.leftSlides.setPower(-0.1);
+            robot.rightSlides.setPower(-0.1);//drop slides
+            mySleep(0.25);
+            robot.stoneArm.setPosition(0.33);//release stone
+            robot.leftSlides.setPower(-0.5);
+            robot.rightSlides.setPower(-0.5);
+            mySleep(0.3);
+            robot.leftSlides.setPower(-0.3);
+            robot.rightSlides.setPower(-0.3);
+
+            //foundation
+            robot.foundationDown();//lower foundation hooks
+            mySleep(0.3);
+            moveEncoderDifferential(-25, 1.4);//drag back a little
+            robot.stopMotors();//
+            robot.FR.setPower(1);//push left side of robot forward
+            robot.RR.setPower(1);
+            mySleep(1);
+            robot.stopMotors();
+            robot.FL.setPower(-1);//pull right side of the robot back
+            robot.RL.setPower(-1);
+            mySleep(1.4);
+            robot.stopMotors();
+            strafeGyro(-1, 0.4);//strafe left to align with middle of foundation
+            moveEncoderDifferential(13, 0.8);//push forward to align with wall
+            robot.foundationUp();//release foundation
+            mySleep(0.3);
+            moveEncoderDifferential(-27, 1.5);//move straight back towards parking spot
+            robot.leftSlides.setPower(0);
+            robot.rightSlides.setPower(0);//release slides because going under bridge
+            moveEncoderDifferential(-20, 1.3);//move under bridge.
+
+//
+//            //move foundation
+//            //.................................................
+//            moveSlides(1, -100);//raise slides
+//            //align robot with foundation
+//            robot.useEncoders(false);
+//            robot.setAllGivenPower(0.3);
+//            mySleep(0.4);
+//            robot.stopMotors();
+//            robot.foundationDown();
+//            mySleep(0.2);
+//            robot.FR.setPower(-0.5);
+//            robot.RR.setPower(-0.5);//power only right side of robot backwards, to rotate foundation. \
+//            mySleep(3);
+//            robot.setAllGivenPower(0.8);//push against the wall
+//            mySleep(1);
+//            robot.foundationUp();
+//            mySleep(0.3);
+//            //....................................................
+//            moveEncoderDifferential(-40, 4);
+//
+//            telemetry.addData("left servo", robot.servoLeft.getPosition());
+//            telemetry.addData("right servo", robot.servoRight.getPosition());
+//            telemetry.addData("hinge", robot.hinge.getPosition());
+//            telemetry.addData("stoneArm", robot.stoneArm.getPosition());
+//
+//            telemetry.update();
+//            while(opModeIsActive()) {
+//
+//            }
         }
     }
 }

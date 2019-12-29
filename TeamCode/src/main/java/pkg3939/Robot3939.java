@@ -122,8 +122,6 @@ public class Robot3939 {
         FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-
-
     boolean LTheld = false;
     boolean RTheld = false;
     public void setSpeed(boolean LTpressed, boolean RTpressed) {
@@ -173,7 +171,6 @@ public class Robot3939 {
         offsetPoint[1] = getHypotenuse(x, y)*Math.sin(Math.toRadians(offsetAngle));
         return offsetPoint;
     }
-
     //Returns the angle in degrees from the origin to the specified point
     public static double returnAngle(double x, double y) {
         double[] angleDirection = new double[2];
@@ -304,9 +301,9 @@ public class Robot3939 {
         } else if(!b2Pressed)
             b2Held = false;
 
-        if(hingeTurn)//work mode
+        if(hingeTurn)//home mode
             hinge.setPosition(0.04);
-        else//home mode
+        else//work mode
             hinge.setPosition(0.71);
     }
 
