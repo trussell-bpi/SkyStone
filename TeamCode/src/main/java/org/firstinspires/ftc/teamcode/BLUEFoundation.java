@@ -728,30 +728,32 @@ public class BLUEFoundation extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         if(opModeIsActive()) {
-            moveSlides(1, -20);
-            strafeGyro(-1,0.8);
-            moveEncoderDifferential(32, 3);
-
-            robot.foundationDown();
+            robot.foundationUp();//init foundation hooks up
+            moveSlides(1, -20);//extend slides slightly to avoid drag
+            strafeGyro(-1,0.8);//strafe right
+            moveEncoderDifferential(32, 3);//move forward until touching foundation
+            robot.foundationDown();//lower foundation hooks
             mySleep(0.3);
-            moveEncoderDifferential(-25, 1.4);//
-            robot.stopMotors();
-            robot.FL.setPower(1);
+            moveEncoderDifferential(-23, 2.7);//drag back a little
+            robot.stopMotors();//
+            robot.FL.setPower(1);//push left side of robot forward
             robot.RL.setPower(1);
-            mySleep(1);
+            mySleep(1.2);
             robot.stopMotors();
-            robot.FR.setPower(-1);
+            moveEncoderDifferential(-10, 2);
+            robot.stopMotors();
+            robot.FR.setPower(-1);//pull right side of the robot back
             robot.RR.setPower(-1);
-            mySleep(1.4);
+            mySleep(1.7);
             robot.stopMotors();
-            strafeGyro(1, 0.4);
-            moveEncoderDifferential(13, 0.8);
-            robot.foundationUp();
-            mySleep(0.3);
-            moveEncoderDifferential(-27, 1.5);
+            strafeGyro(1, 0.7);//strafe left to align with middle of foundation
+            moveEncoderDifferential(13, 2);//push forward to align with wall
+            robot.foundationUp();//release foundation
+
+            moveEncoderDifferential(-27, 2.7);//move straight back towards parking spot
             robot.leftSlides.setPower(0);
-            robot.rightSlides.setPower(0);
-            moveEncoderDifferential(-18, 1.3);
+            robot.rightSlides.setPower(0);//release slides because going under bridge
+            moveEncoderDifferential(-16, 2.4);//move under bridge.
 
 
             telemetry.addData("FR", robot.FR.getPower());

@@ -733,11 +733,11 @@ public class REDFoundation extends LinearOpMode {
             moveEncoderDifferential(32, 3);//move forward until touching foundation
             robot.foundationDown();//lower foundation hooks
             mySleep(0.3);
-            moveEncoderDifferential(-20, 2.5);//drag back a little
+            moveEncoderDifferential(-23, 2.7);//drag back a little
             robot.stopMotors();//
             robot.FR.setPower(1);//push left side of robot forward
             robot.RR.setPower(1);
-            mySleep(1);
+            mySleep(1.5);
             robot.stopMotors();
             robot.FL.setPower(-1);//pull right side of the robot back
             robot.RL.setPower(-1);
@@ -764,9 +764,6 @@ public class REDFoundation extends LinearOpMode {
             telemetry.addData("stoneArm", robot.stoneArm.getPosition());
 
             telemetry.update();
-            while(opModeIsActive()) {
-
-            }
         }
     }
 }

@@ -755,6 +755,7 @@ public class REDSkyWithFoundation extends LinearOpMode {
             robot.foundationUp();
             moveSlides(1, -180);
             robot.hinge.setPosition(0.71);
+            mySleep(0.4);
             robot.stoneArm.setPosition(0.33);
             mySleep(0.75);
             robot.leftSlides.setPower(0);
@@ -778,8 +779,8 @@ public class REDSkyWithFoundation extends LinearOpMode {
             mySleep(0.1);
             robot.stoneArm.setPosition(0.03);
             mySleep(0.3);
-            robot.leftSlides.setPower(-0.6);
-            robot.rightSlides.setPower(-0.6);
+            robot.leftSlides.setPower(-0.5);
+            robot.rightSlides.setPower(-0.5);
             mySleep(0.1);
             robot.leftSlides.setPower(-0.3);
             robot.rightSlides.setPower(-0.3);
@@ -810,7 +811,7 @@ public class REDSkyWithFoundation extends LinearOpMode {
             //foundation
             robot.foundationDown();//lower foundation hooks
             mySleep(0.3);
-            moveEncoderDifferential(-25, 1.4);//drag back a little
+            moveEncoderDifferential(-28, 1.4);//drag back a little
             robot.stopMotors();//
             robot.FR.setPower(1);//push left side of robot forward
             robot.RR.setPower(1);
@@ -820,7 +821,7 @@ public class REDSkyWithFoundation extends LinearOpMode {
             robot.RL.setPower(-1);
             mySleep(1.4);
             robot.stopMotors();
-            strafeGyro(-1, 0.4);//strafe left to align with middle of foundation
+            strafeGyro(-1, 0.7 );//strafe left to align with middle of foundation
             moveEncoderDifferential(13, 0.8);//push forward to align with wall
             robot.foundationUp();//release foundation
             mySleep(0.3);

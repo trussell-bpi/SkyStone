@@ -59,9 +59,9 @@ import pkg3939.skystoneDetectorClass;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="BLUEFoundationWALLSIDE", group="skystoe")
+@Autonomous(name="PARKRight", group="skystoe")
 //@Disabled
-public class BLUEFoundationWALLSIDE extends LinearOpMode {
+public class PARKRight extends LinearOpMode {
 
     /* Declare OpMode members. */
     Robot3939 robot = new Robot3939();   // Use a Pushbot's hardware
@@ -561,7 +561,7 @@ public class BLUEFoundationWALLSIDE extends LinearOpMode {
 
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes working
-                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
+                double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
                 robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
                 robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
                 robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
@@ -728,32 +728,8 @@ public class BLUEFoundationWALLSIDE extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         if(opModeIsActive()) {
-            robot.foundationUp();//init foundation hooks up
-            moveSlides(1, -20);//extend slides slightly to avoid drag
-            strafeGyro(-1,0.8);//strafe right
-            moveEncoderDifferential(32, 3);//move forward until touching foundation
-            robot.foundationDown();//lower foundation hooks
-            mySleep(0.3);
-            moveEncoderDifferential(-23, 2.7);//drag back a little
-            robot.stopMotors();//
-            robot.FL.setPower(1);//push left side of robot forward
-            robot.RL.setPower(1);
-            mySleep(1.2);
-            robot.stopMotors();
-            moveEncoderDifferential(-10, 2);
-            robot.stopMotors();
-            robot.FR.setPower(-1);//pull right side of the robot back
-            robot.RR.setPower(-1);
-            mySleep(1.7);
-            robot.stopMotors();
-            strafeGyro(1, 0.7);//strafe left to align with middle of foundation
-            moveEncoderDifferential(15.5, 2);//push forward to align with wall
-            robot.foundationUp();//release foundation
-            moveEncoderDifferential(-22, 2.7);//move straight back towards parking spot
-            robot.leftSlides.setPower(0);
-            robot.rightSlides.setPower(0);//release slides because going under bridge
-            strafeGyro(-1, 0.9);
-            moveEncoderDifferential(-18, 2.4);//move under bridge.
+            strafeGyro(1, 1.2);
+            moveEncoderDifferential(20, 2);
 
 
             telemetry.addData("FR", robot.FR.getPower());

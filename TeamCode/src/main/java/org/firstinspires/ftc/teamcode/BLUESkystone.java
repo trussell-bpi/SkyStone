@@ -59,7 +59,7 @@ import pkg3939.skystoneDetectorClass;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="REDSkystone", group="Pushbot")
+@Autonomous(name="BLUESkystone", group="Pushbot")
 //@Disabled
 public class BLUESkystone extends LinearOpMode {
 
