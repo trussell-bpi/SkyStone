@@ -334,13 +334,11 @@ public class AutoTemplate2 extends LinearOpMode {
     }
 
     public void moveEncoderDifferential(double distance) {
-        double k = 0.0005;
+        double k = 0.0006;
         double minSpeed = 0.2;
         double startSpeed = 0.5;
-
         double rotations = distance/ wheelCircumference; //distance / circumference (inches)
         int targetTicks = (int)(rotations*ticksPerRev);
-
         int currentTickAvg = (robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4;
         double tickDifference = targetTicks - currentTickAvg;
         double power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, startSpeed);
@@ -366,15 +364,13 @@ public class AutoTemplate2 extends LinearOpMode {
 
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes
-
-                if(runtime.seconds() > 5)//fail safe, in case of infinite loop
-                    break;
-
-
                 currentTickAvg = (int)((robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4.0);
                 tickDifference = targetTicks - currentTickAvg;
 
-                if(runtime.seconds() < 0.3)
+                if(Math.abs(targetTicks - currentTickAvg) < 20)//fail safe, in case of infinite loop
+                    break;
+
+                if(runtime.seconds() < 0.2)
                     power = startSpeed;
                 else
                     power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, 1);

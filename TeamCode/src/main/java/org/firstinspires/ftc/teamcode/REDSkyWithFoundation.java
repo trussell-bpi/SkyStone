@@ -96,7 +96,7 @@ public class REDSkyWithFoundation extends LinearOpMode {
     }
 
     public void rotateEnc(int targetTicks, double failsafe) {
-        double k = 0.0004;
+        double k = 0.0005;
 
         robot.stopAndResetEncoders();
 
@@ -123,6 +123,7 @@ public class REDSkyWithFoundation extends LinearOpMode {
             robot.setAllGivenPower(power);
 
             double startAngle = robot.getAngle();
+            runtime.reset();
 
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes
@@ -130,6 +131,8 @@ public class REDSkyWithFoundation extends LinearOpMode {
 //                    robot.stopMotors();
 //                    break;
 //                }
+                if(runtime.seconds() > failsafe)//fail safe, in case of infinite loop
+                    break;
 
 
                 tickAvg = (int)((Math.abs(robot.FL.getCurrentPosition()) + Math.abs(robot.FR.getCurrentPosition()) + Math.abs(robot.RL.getCurrentPosition()) + Math.abs(robot.RR.getCurrentPosition()))/4);
@@ -765,10 +768,10 @@ public class REDSkyWithFoundation extends LinearOpMode {
             if(vals[0] == 0){//middle
                 moveEncoderDifferential(32, 1.8);
             } else if(vals[1] == 0) {//left
-                strafeGyro(-1, 0.45);
+                strafeGyro(-1, 0.3);
                 moveEncoderDifferential(32, 1.8);
             } else {//right
-                strafeGyro(1, 0.45);
+                strafeGyro(1, 0.3);
                 moveEncoderDifferential(32, 1.8 );
             }
 
@@ -785,7 +788,7 @@ public class REDSkyWithFoundation extends LinearOpMode {
             robot.leftSlides.setPower(-0.3);
             robot.rightSlides.setPower(-0.3);
             moveEncoderDifferential(-6, 0.8);
-            rotateEnc(-1960, 1);
+            rotateEnc(-1970, 1.69);
 
             if(vals[0] == 0){//middle
                 moveEncoderDifferential(85, 3.3);//run to foundation side
@@ -794,10 +797,13 @@ public class REDSkyWithFoundation extends LinearOpMode {
             } else {//right
                 moveEncoderDifferential(80, 3.1);//run to foundation side
             }
-            robot.leftSlides.setPower(-0.6);
-            robot.rightSlides.setPower(-0.6);
-            rotateEnc(1960, 1.6);
-            moveEncoderDifferential(7.5, 2);
+            robot.leftSlides.setPower(-1);//slides going up
+            robot.rightSlides.setPower(-1);
+            mySleep(0.15);
+            robot.leftSlides.setPower(-0.3);//slides hold
+            robot.rightSlides.setPower(-0.3);
+            rotateEnc(1970, 1.69);
+            moveEncoderDifferential(9, 2.5);//push against foundation
             robot.leftSlides.setPower(-0.1);
             robot.rightSlides.setPower(-0.1);//drop slides
             mySleep(0.25);
@@ -822,7 +828,7 @@ public class REDSkyWithFoundation extends LinearOpMode {
             mySleep(1.4);
             robot.stopMotors();
             strafeGyro(-1, 0.7 );//strafe left to align with middle of foundation
-            moveEncoderDifferential(13, 0.8);//push forward to align with wall
+            moveEncoderDifferential(16, 1.1);//push forward to align with wall
             robot.foundationUp();//release foundation
             mySleep(0.3);
             moveEncoderDifferential(-27, 1.5);//move straight back towards parking spot
@@ -830,36 +836,7 @@ public class REDSkyWithFoundation extends LinearOpMode {
             robot.rightSlides.setPower(0);//release slides because going under bridge
             moveEncoderDifferential(-20, 1.3);//move under bridge.
 
-//
-//            //move foundation
-//            //.................................................
-//            moveSlides(1, -100);//raise slides
-//            //align robot with foundation
-//            robot.useEncoders(false);
-//            robot.setAllGivenPower(0.3);
-//            mySleep(0.4);
-//            robot.stopMotors();
-//            robot.foundationDown();
-//            mySleep(0.2);
-//            robot.FR.setPower(-0.5);
-//            robot.RR.setPower(-0.5);//power only right side of robot backwards, to rotate foundation. \
-//            mySleep(3);
-//            robot.setAllGivenPower(0.8);//push against the wall
-//            mySleep(1);
-//            robot.foundationUp();
-//            mySleep(0.3);
-//            //....................................................
-//            moveEncoderDifferential(-40, 4);
-//
-//            telemetry.addData("left servo", robot.servoLeft.getPosition());
-//            telemetry.addData("right servo", robot.servoRight.getPosition());
-//            telemetry.addData("hinge", robot.hinge.getPosition());
-//            telemetry.addData("stoneArm", robot.stoneArm.getPosition());
-//
-//            telemetry.update();
-//            while(opModeIsActive()) {
-//
-//            }
+
         }
     }
 }

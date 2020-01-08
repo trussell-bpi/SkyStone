@@ -314,10 +314,10 @@ public class Robot3939 {
         } else if(!a2Pressed)
             a2Held = false;
 
-        if(stoneArmGrab)//down
-            stoneArm.setPosition(0.03);
-        else//up
+        if(stoneArmGrab)//up
             stoneArm.setPosition(0.33);
+        else//down
+            stoneArm.setPosition(0.03);
     }
 
     public void hookFoundation(boolean aPressed) {
