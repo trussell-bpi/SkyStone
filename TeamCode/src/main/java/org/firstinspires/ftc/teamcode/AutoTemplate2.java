@@ -367,7 +367,7 @@ public class AutoTemplate2 extends LinearOpMode {
                 currentTickAvg = (int)((robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4.0);
                 tickDifference = targetTicks - currentTickAvg;
 
-                if(Math.abs(targetTicks - currentTickAvg) < 20)//fail safe, in case of infinite loop
+                if(Math.abs(tickDifference) < 30)//fail safe, in case of infinite loop
                     break;
 
                 if(runtime.seconds() < 0.2)
@@ -394,10 +394,10 @@ public class AutoTemplate2 extends LinearOpMode {
                 telemetry.addData("FR ticks", robot.FR.getCurrentPosition());
                 telemetry.addData("RR ticks", robot.RR.getCurrentPosition());
                 telemetry.addData("RL ticks", robot.RL.getCurrentPosition());
-                telemetry.addData("timer", (int)runtime.seconds());
+                telemetry.addData("timer", runtime.seconds());
                 telemetry.update();
             }
-            robot.stopMotors();
+            robot.stopAndResetEncoders();
             robot.useEncoders(true);
 
             telemetry.addData("Path", "Complete");
@@ -612,12 +612,13 @@ public class AutoTemplate2 extends LinearOpMode {
 //            telemetry.addData("Values", vals[1] + "   " + vals[0] + "   " + vals[2]);
 //            telemetry.addLine("hi");
 //            telemetry.update();
-            telemetry.addData("deviceName",sensorRange.getDeviceName() );
-            telemetry.addData("range", String.format("%.01f mm", sensorRange.getDistance(DistanceUnit.MM)));
-            telemetry.addData("range", String.format("%.01f cm", sensorRange.getDistance(DistanceUnit.CM)));
-            telemetry.addData("range", String.format("%.01f m", sensorRange.getDistance(DistanceUnit.METER)));
-            telemetry.addData("range", String.format("%.01f in", sensorRange.getDistance(DistanceUnit.INCH)));
+//            telemetry.addData("deviceName",sensorRange.getDeviceName() );
+//            telemetry.addData("range", String.format("%.01f mm", sensorRange.getDistance(DistanceUnit.MM)));
+//            telemetry.addData("range", String.format("%.01f cm", sensorRange.getDistance(DistanceUnit.CM)));
+//            telemetry.addData("range", String.format("%.01f m", sensorRange.getDistance(DistanceUnit.METER)));
+//            telemetry.addData("range", String.format("%.01f in", sensorRange.getDistance(DistanceUnit.INCH)));
 
+            moveEncoderDifferential(18 );
             // Rev2mDistanceSensor specific methods.
             telemetry.addData("ID", String.format("%x", sensorTimeOfFlight.getModelID()));
             telemetry.addData("did time out", Boolean.toString(sensorTimeOfFlight.didTimeoutOccur()));
