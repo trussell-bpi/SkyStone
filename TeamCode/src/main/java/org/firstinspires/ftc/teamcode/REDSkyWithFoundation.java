@@ -768,7 +768,7 @@ public class REDSkyWithFoundation extends LinearOpMode {
             if(vals[0] == 0){//middle
                 moveEncoderDifferential(32, 1.8);
             } else if(vals[1] == 0) {//left
-                strafeGyro(-1, 0.4);
+                strafeGyro(-1, 0.42);
                 moveEncoderDifferential(32, 1.8);
             } else {//right
                 strafeGyro(1, 0.4);
@@ -788,10 +788,10 @@ public class REDSkyWithFoundation extends LinearOpMode {
             robot.leftSlides.setPower(-0.3);//hold
             robot.rightSlides.setPower(-0.3);
             moveEncoderDifferential(-6, 0.8);
-            rotateEnc(-1970, 1.5);
+            rotateEnc(-1970, 1.1);
 
             if(vals[0] == 0){//middle
-                moveEncoderDifferential(85, 3.3);//run to foundation side
+                moveEncoderDifferential(87, 3.3);//run to foundation side
             } else if(vals[1] == 0) {//left
                 moveEncoderDifferential(95, 3.5);//run to foundation side
             } else {//right
@@ -824,16 +824,16 @@ public class REDSkyWithFoundation extends LinearOpMode {
             mySleep(1);
             robot.stopMotors();
             robot.setAllGivenPower(-1);
-            mySleep(0.9);
+            mySleep(0.5);
             robot.FR.setPower(0);//stop left side of robot
             robot.RR.setPower(0);
-            mySleep(0.5);
+            mySleep(1);
             robot.stopMotors();
-            strafeGyro(-1, 0.7 );//strafe left to align with middle of foundation
-            moveEncoderDifferential(14, 1);//push forward to align with wall
+            strafeGyro(-1, 1  );//strafe left to align with middle of foundation
+            moveEncoderDifferential(16, 1.2);//push forward to align with wall
             robot.foundationUp();//release foundation
             mySleep(0.3);
-            moveEncoderDifferential(-27, 1.5);//move straight back towards parking spot
+            moveEncoderDifferential(-27, 1.4) ;//move straight back towards parking spot
             robot.leftSlides.setPower(0);
             robot.rightSlides.setPower(0);//release slides because going under bridge
             moveEncoderDifferential(-20, 1.3);//move under bridge.
