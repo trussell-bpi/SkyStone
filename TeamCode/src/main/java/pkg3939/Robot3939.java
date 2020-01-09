@@ -58,8 +58,8 @@ public class Robot3939 {
         leftSlides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightSlides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//        leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         leftSlides.setDirection(DcMotorSimple.Direction.REVERSE);
         rightSlides.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -317,7 +317,7 @@ public class Robot3939 {
         if(stoneArmGrab)//up
             stoneArm.setPosition(0.33);
         else//down
-            stoneArm.setPosition(0.03);
+            stoneArm.setPosition(0.00 );
     }
 
     public void hookFoundation(boolean aPressed) {

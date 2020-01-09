@@ -31,58 +31,16 @@ public class HolonomicGyro extends LinearOpMode {
         }
     }
 
-//    public void moveSlides(double power, int constant) {
-//        if (opModeIsActive()) {
-//            robot.leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//            robot.rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//
-//            robot.leftSlides.setTargetPosition(robot.leftSlides.getCurrentPosition() + constant);
-//            robot.rightSlides.setTargetPosition(robot.rightSlides.getCurrentPosition() + constant);
-//
-//            robot.leftSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            robot.rightSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//
-//            robot.leftSlides.setPower(power);
-//            robot.rightSlides.setPower(power);
-//
-//            runtime.reset();
-//
-//            while (robot.leftSlides.isBusy() || robot.rightSlides.isBusy()) {
-//                //wait till motor finishes working
-//                robot.drive(gamepad1.left_stick_x,
-//                        gamepad1.left_stick_y,
-//                        gamepad1.right_stick_x);
-//                telemetry.addLine("Slides Extending");
-//                telemetry.update();
-//                if (runtime.seconds() > 1.2)
-//                    break;
-//            }
-//            telemetry.addLine("Extended");
-//            telemetry.update();
-//
-//            robot.leftSlides.setPower(0);
-//            robot.rightSlides.setPower(0);
-//
-//            robot.leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//            robot.rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//
-//            robot.leftSlides.setPower(-0.4);
-//            robot.rightSlides.setPower(-0.4);
-//            //
-////            robot.leftSlides.setPower(0);
-////            robot.rightSlides.setPower(0);
-//        }
-//    }
     public void moveSlides(double power, int constant) {
         if (opModeIsActive()) {
-            robot.leftSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.rightSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-            robot.leftSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.rightSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             robot.leftSlides.setTargetPosition(robot.leftSlides.getCurrentPosition() + constant);
             robot.rightSlides.setTargetPosition(robot.rightSlides.getCurrentPosition() + constant);
+
+            robot.leftSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             robot.leftSlides.setPower(power);
             robot.rightSlides.setPower(power);
@@ -105,11 +63,17 @@ public class HolonomicGyro extends LinearOpMode {
             robot.leftSlides.setPower(0);
             robot.rightSlides.setPower(0);
 
+            robot.leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            robot.leftSlides.setPower(-0.4);
+            robot.rightSlides.setPower(-0.4);
             //
-    //            robot.leftSlides.setPower(0);
-    //            robot.rightSlides.setPower(0);
+//            robot.leftSlides.setPower(0);
+//            robot.rightSlides.setPower(0);
         }
     }
+
 
     @Override //when init is pressed
     public void runOpMode() {
@@ -141,11 +105,11 @@ public class HolonomicGyro extends LinearOpMode {
             robot.setStoneArm(gamepad2.a);
 
             if (gamepad2.right_bumper && !robot.slidesDown())
-                moveSlides(0.5, 20);
+                moveSlides(0.2, 20);
             else if (gamepad2.left_bumper)
-                moveSlides(1, -50);
+                moveSlides(-1, -50);
             else if (gamepad2.dpad_up && robot.slidesDown())
-                moveSlides(1, -220);
+                moveSlides(-1, -220);
             else if (gamepad2.dpad_down) {
                 robot.leftSlides.setPower(0);
                 robot.rightSlides.setPower(0);
@@ -153,12 +117,13 @@ public class HolonomicGyro extends LinearOpMode {
 
             //elevate slightly to move stone under bridge
             if(!y2Held && gamepad2.y) {
+                y2Held = true;
                 robot.leftSlides.setPower(-0.5);
                 robot.rightSlides.setPower(-0.5);
                 mySleep(0.1);
                 robot.leftSlides.setPower(-0.3);
                 robot.rightSlides.setPower(-0.3);
-            } else if(!gamepad1.y) {
+            } else if(!gamepad2.y) {
                 y2Held = false;
             }
 
