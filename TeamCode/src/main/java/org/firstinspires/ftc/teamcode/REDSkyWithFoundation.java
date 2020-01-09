@@ -756,11 +756,11 @@ public class REDSkyWithFoundation extends LinearOpMode {
 
 
             robot.foundationUp();
-            moveSlides(1, -180);
-            robot.hinge.setPosition(0.71);
+            moveSlides(1, -120);
+            robot.hinge.setPosition(0.72);
             mySleep(0.4);
-            robot.stoneArm.setPosition(0.33);
-            mySleep(0.75);
+            robot.stoneArm.setPosition(0.26);
+            mySleep(0.5);
             robot.leftSlides.setPower(0);
             robot.rightSlides.setPower(0);
 
@@ -768,27 +768,27 @@ public class REDSkyWithFoundation extends LinearOpMode {
             if(vals[0] == 0){//middle
                 moveEncoderDifferential(32, 1.8);
             } else if(vals[1] == 0) {//left
-                strafeGyro(-1, 0.3);
+                strafeGyro(-1, 0.4);
                 moveEncoderDifferential(32, 1.8);
             } else {//right
-                strafeGyro(1, 0.3);
-                moveEncoderDifferential(32, 1.8 );
+                strafeGyro(1, 0.4);
+                moveEncoderDifferential(32, 1.8);
             }
 
 //            //-0.3 = hold
 //            //-0.4 = slowly up without stone
 //            //-0.45 = slowly up WITH stone
 //
-            mySleep(0.1);
+           // mySleep(0.1);
             robot.stoneArm.setPosition(0.03);
             mySleep(0.3);
-            robot.leftSlides.setPower(-0.5);
+            robot.leftSlides.setPower(-0.5);//up
             robot.rightSlides.setPower(-0.5);
             mySleep(0.1);
-            robot.leftSlides.setPower(-0.3);
+            robot.leftSlides.setPower(-0.3);//hold
             robot.rightSlides.setPower(-0.3);
             moveEncoderDifferential(-6, 0.8);
-            rotateEnc(-1970, 1.69);
+            rotateEnc(-1970, 1.5);
 
             if(vals[0] == 0){//middle
                 moveEncoderDifferential(85, 3.3);//run to foundation side
@@ -802,15 +802,15 @@ public class REDSkyWithFoundation extends LinearOpMode {
             mySleep(0.15);
             robot.leftSlides.setPower(-0.3);//slides hold
             robot.rightSlides.setPower(-0.3);
-            rotateEnc(1970, 1.69);
-            moveEncoderDifferential(9, 2.5);//push against foundation
+            rotateEnc(1970, 1.5);
+            moveEncoderDifferential(9, 1.2);//push against foundation
             robot.leftSlides.setPower(-0.1);
             robot.rightSlides.setPower(-0.1);//drop slides
             mySleep(0.25);
             robot.stoneArm.setPosition(0.33);//release stone
             robot.leftSlides.setPower(-0.5);
             robot.rightSlides.setPower(-0.5);
-            mySleep(0.3);
+            mySleep(0.15);
             robot.leftSlides.setPower(-0.3);
             robot.rightSlides.setPower(-0.3);
 
@@ -823,18 +823,32 @@ public class REDSkyWithFoundation extends LinearOpMode {
             robot.RR.setPower(1);
             mySleep(1);
             robot.stopMotors();
-            robot.FL.setPower(-1);//pull right side of the robot back
-            robot.RL.setPower(-1);
-            mySleep(1.4);
+            robot.setAllGivenPower(-1);
+            mySleep(0.9);
+            robot.FR.setPower(0);//stop left side of robot
+            robot.RR.setPower(0);
+            mySleep(0.5);
             robot.stopMotors();
             strafeGyro(-1, 0.7 );//strafe left to align with middle of foundation
-            moveEncoderDifferential(16, 1.1);//push forward to align with wall
+            moveEncoderDifferential(14, 1);//push forward to align with wall
             robot.foundationUp();//release foundation
             mySleep(0.3);
             moveEncoderDifferential(-27, 1.5);//move straight back towards parking spot
             robot.leftSlides.setPower(0);
             robot.rightSlides.setPower(0);//release slides because going under bridge
             moveEncoderDifferential(-20, 1.3);//move under bridge.
+//            robot.FL.setPower(-1);//pull right side of the robot back
+//            robot.RL.setPower(-1);
+//            mySleep(1.4);
+//            robot.stopMotors();
+//            strafeGyro(-1, 0.7 );//strafe left to align with middle of foundation
+//            moveEncoderDifferential(15, 1);//push forward to align with wall
+//            robot.foundationUp();//release foundation
+//            mySleep(0.3);
+//            moveEncoderDifferential(-27, 1.5);//move straight back towards parking spot
+//            robot.leftSlides.setPower(0);
+//            robot.rightSlides.setPower(0);//release slides because going under bridge
+//            moveEncoderDifferential(-20, 1.3);//move under bridge.
 
 
         }

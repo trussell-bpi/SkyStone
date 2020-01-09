@@ -334,7 +334,7 @@ public class AutoTemplate2 extends LinearOpMode {
     }
 
     public void moveEncoderDifferential(double distance) {
-        double k = 0.0006;
+        double k = 0.0005;
         double minSpeed = 0.2;
         double startSpeed = 0.5;
         double rotations = distance/ wheelCircumference; //distance / circumference (inches)
@@ -342,9 +342,7 @@ public class AutoTemplate2 extends LinearOpMode {
         int currentTickAvg = (robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4;
         double tickDifference = targetTicks - currentTickAvg;
         double power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, startSpeed);
-
-//        if(tickDifference < 0)
-//            power = -power;
+        double failsafe = 1/26*Math.abs(distance) + 2;
 
         robot.stopAndResetEncoders();
         robot.useEncoders(true);
@@ -364,13 +362,14 @@ public class AutoTemplate2 extends LinearOpMode {
 
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes
+
+                if(runtime.seconds() > failsafe)//fail safe, in case of infinite loop
+                    break;
+
                 currentTickAvg = (int)((robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4.0);
                 tickDifference = targetTicks - currentTickAvg;
 
-                if(Math.abs(tickDifference) < 30)//fail safe, in case of infinite loop
-                    break;
-
-                if(runtime.seconds() < 0.2)
+                if(runtime.seconds() < 0.15)
                     power = startSpeed;
                 else
                     power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, 1);
@@ -394,10 +393,10 @@ public class AutoTemplate2 extends LinearOpMode {
                 telemetry.addData("FR ticks", robot.FR.getCurrentPosition());
                 telemetry.addData("RR ticks", robot.RR.getCurrentPosition());
                 telemetry.addData("RL ticks", robot.RL.getCurrentPosition());
-                telemetry.addData("timer", runtime.seconds());
+                telemetry.addData("timer", (int)runtime.seconds());
                 telemetry.update();
             }
-            robot.stopAndResetEncoders();
+            robot.stopMotors();
             robot.useEncoders(true);
 
             telemetry.addData("Path", "Complete");
@@ -606,7 +605,7 @@ public class AutoTemplate2 extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        while(opModeIsActive()) {
+        if(opModeIsActive()) {
 //            detector.updateVals();
 //            vals = detector.getVals();
 //            telemetry.addData("Values", vals[1] + "   " + vals[0] + "   " + vals[2]);
@@ -618,7 +617,9 @@ public class AutoTemplate2 extends LinearOpMode {
 //            telemetry.addData("range", String.format("%.01f m", sensorRange.getDistance(DistanceUnit.METER)));
 //            telemetry.addData("range", String.format("%.01f in", sensorRange.getDistance(DistanceUnit.INCH)));
 
-            moveEncoderDifferential(18 );
+            moveEncoderDifferential(32);
+            moveEncoderDifferential(-32);
+
             // Rev2mDistanceSensor specific methods.
             telemetry.addData("ID", String.format("%x", sensorTimeOfFlight.getModelID()));
             telemetry.addData("did time out", Boolean.toString(sensorTimeOfFlight.didTimeoutOccur()));
