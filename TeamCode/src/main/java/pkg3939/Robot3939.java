@@ -58,8 +58,8 @@ public class Robot3939 {
         leftSlides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightSlides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         leftSlides.setDirection(DcMotorSimple.Direction.REVERSE);
         rightSlides.setDirection(DcMotorSimple.Direction.FORWARD);

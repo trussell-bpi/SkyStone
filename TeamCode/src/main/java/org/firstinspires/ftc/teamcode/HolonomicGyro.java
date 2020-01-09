@@ -31,16 +31,58 @@ public class HolonomicGyro extends LinearOpMode {
         }
     }
 
+//    public void moveSlides(double power, int constant) {
+//        if (opModeIsActive()) {
+//            robot.leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//            robot.rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//
+//            robot.leftSlides.setTargetPosition(robot.leftSlides.getCurrentPosition() + constant);
+//            robot.rightSlides.setTargetPosition(robot.rightSlides.getCurrentPosition() + constant);
+//
+//            robot.leftSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            robot.rightSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//
+//            robot.leftSlides.setPower(power);
+//            robot.rightSlides.setPower(power);
+//
+//            runtime.reset();
+//
+//            while (robot.leftSlides.isBusy() || robot.rightSlides.isBusy()) {
+//                //wait till motor finishes working
+//                robot.drive(gamepad1.left_stick_x,
+//                        gamepad1.left_stick_y,
+//                        gamepad1.right_stick_x);
+//                telemetry.addLine("Slides Extending");
+//                telemetry.update();
+//                if (runtime.seconds() > 1.2)
+//                    break;
+//            }
+//            telemetry.addLine("Extended");
+//            telemetry.update();
+//
+//            robot.leftSlides.setPower(0);
+//            robot.rightSlides.setPower(0);
+//
+//            robot.leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            robot.rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//
+//            robot.leftSlides.setPower(-0.4);
+//            robot.rightSlides.setPower(-0.4);
+//            //
+////            robot.leftSlides.setPower(0);
+////            robot.rightSlides.setPower(0);
+//        }
+//    }
     public void moveSlides(double power, int constant) {
         if (opModeIsActive()) {
-            robot.leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-            robot.leftSlides.setTargetPosition(robot.leftSlides.getCurrentPosition() + constant);
-            robot.rightSlides.setTargetPosition(robot.rightSlides.getCurrentPosition() + constant);
+            robot.leftSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.rightSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
             robot.leftSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.rightSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            robot.leftSlides.setTargetPosition(robot.leftSlides.getCurrentPosition() + constant);
+            robot.rightSlides.setTargetPosition(robot.rightSlides.getCurrentPosition() + constant);
 
             robot.leftSlides.setPower(power);
             robot.rightSlides.setPower(power);
@@ -63,14 +105,9 @@ public class HolonomicGyro extends LinearOpMode {
             robot.leftSlides.setPower(0);
             robot.rightSlides.setPower(0);
 
-            robot.leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-            robot.leftSlides.setPower(-0.4);
-            robot.rightSlides.setPower(-0.4);
             //
-//            robot.leftSlides.setPower(0);
-//            robot.rightSlides.setPower(0);
+    //            robot.leftSlides.setPower(0);
+    //            robot.rightSlides.setPower(0);
         }
     }
 
@@ -82,6 +119,8 @@ public class HolonomicGyro extends LinearOpMode {
         //robot.initIMU(hardwareMap);
         robot.useEncoders(false);//don't need encoders for teleop
         robot.initLinearSlides(hardwareMap);
+
+
 
         boolean yHeld = false;
         boolean y2Held = false;
