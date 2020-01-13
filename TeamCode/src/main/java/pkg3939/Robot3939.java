@@ -30,6 +30,7 @@ public class Robot3939 {
     public double FLpower, FRpower, RLpower, RRpower;//power of the motors
     public double speed = 10.0;
 
+    public static final double HOLD_POWER = -0.3;
     public static final double minSpeed = 0.10;
     public static final boolean earthIsFlat = true;
 
@@ -63,6 +64,16 @@ public class Robot3939 {
 
         leftSlides.setDirection(DcMotorSimple.Direction.REVERSE);
         rightSlides.setDirection(DcMotorSimple.Direction.FORWARD);
+    }
+
+    public void dropSlides() {
+        leftSlides.setPower(0);
+        rightSlides.setPower(0);
+    }
+
+    public void holdSlides() {
+        leftSlides.setPower(HOLD_POWER);
+        rightSlides.setPower(HOLD_POWER);
     }
 
     public void setFront(HardwareMap hwmap) {
@@ -268,6 +279,11 @@ public class Robot3939 {
         return false;
     }
 
+    public void setSlidesPower(double power) {
+        leftSlides.setPower(power);
+        rightSlides.setPower(power);
+    }
+
     public void leftServoDown() {
         servoLeft.setPosition(0.29);
     }
@@ -294,6 +310,7 @@ public class Robot3939 {
         leftServoUp();
     }
 
+
     public void setHinge(boolean b2Pressed) {
         if(!b2Held && b2Pressed) {
             b2Held = true;
@@ -301,10 +318,18 @@ public class Robot3939 {
         } else if(!b2Pressed)
             b2Held = false;
 
-        if(hingeTurn)//home mode
+        if(hingeTurn)//work mode
+            hinge.setPosition(0.72);
+        else//home mode
             hinge.setPosition(0.04);
-        else//work mode
-            hinge.setPosition(0.71);
+    }
+
+    public void stoneArmDown() {
+        stoneArm.setPosition(0.00);
+    }
+
+    public void stoneArmUp() {
+        stoneArm.setPosition(0.25);
     }
 
     public void setStoneArm(boolean a2Pressed) {
@@ -315,10 +340,11 @@ public class Robot3939 {
             a2Held = false;
 
         if(stoneArmGrab)//up
-            stoneArm.setPosition(0.33);
+            stoneArm.setPosition(0.25);
         else//down
             stoneArm.setPosition(0.00 );
     }
+
 
     public void hookFoundation(boolean aPressed) {
         if (!aHeld && aPressed) {

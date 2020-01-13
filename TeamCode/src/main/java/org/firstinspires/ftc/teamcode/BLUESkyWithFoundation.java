@@ -784,11 +784,11 @@ public class BLUESkyWithFoundation extends LinearOpMode {
             mySleep(0.3);
             robot.leftSlides.setPower(-0.5);//up
             robot.rightSlides.setPower(-0.5);
-            mySleep(0.1);
+            mySleep(0.08);
             robot.leftSlides.setPower(-0.3);//hold
             robot.rightSlides.setPower(-0.3);
             moveEncoderDifferential(-6, 0.8);
-            rotateEnc(1970, 1.1);//turn left 90 degrees
+            rotateEnc(1970, 1.69);//turn left 90 degrees
 
             if(vals[0] == 0){//middle
                 moveEncoderDifferential(87, 3.3);//run to foundation side
@@ -802,7 +802,7 @@ public class BLUESkyWithFoundation extends LinearOpMode {
             mySleep(0.15);
             robot.leftSlides.setPower(-0.3);//slides hold
             robot.rightSlides.setPower(-0.3);
-            rotateEnc(-1970, 1.5);//turn left 90 degrees
+            rotateEnc(-1970, 1.69);//turn left 90 degrees
             moveEncoderDifferential(9, 1.2);//push against foundation
             robot.leftSlides.setPower(-0.1);
             robot.rightSlides.setPower(-0.1);//drop slides
