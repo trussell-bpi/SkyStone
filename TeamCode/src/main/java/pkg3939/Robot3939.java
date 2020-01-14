@@ -133,6 +133,13 @@ public class Robot3939 {
         FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
+    public void setAllTargetPosition(int targetTicks) {
+        RL.setTargetPosition(targetTicks);
+        RR.setTargetPosition(targetTicks);
+        FL.setTargetPosition(targetTicks);
+        FR.setTargetPosition(targetTicks);
+    }
+
     boolean LTheld = false;
     boolean RTheld = false;
     public void setSpeed(boolean LTpressed, boolean RTpressed) {

@@ -119,10 +119,7 @@ public class AutoTemplate2 extends LinearOpMode {
             robot.FL.setTargetPosition(targetTicks);
             robot.FR.setTargetPosition(-targetTicks);
 
-            robot.RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.RUN_TO_POSITION();
 
             robot.setAllGivenPower(power);
 
@@ -261,7 +258,7 @@ public class AutoTemplate2 extends LinearOpMode {
 
     }
 
-    private void strafeGyro(double power, double time) {//uses gyro to make sure robot's angle stays the same - prevents unintentional rotation
+    public void strafeGyro(double power, double time) {//uses gyro to make sure robot's angle stays the same - prevents unintentional rotation
         double startAngle = robot.getAngle();
         robot.FLpower = +power;
         robot.FRpower = -power;
@@ -406,30 +403,16 @@ public class AutoTemplate2 extends LinearOpMode {
     }
 
     public void moveDistanceEnc(double power, double distance) {
-        robot.stopAndResetEncoders();
-
-        robot.useEncoders(true);
-
         double rotations = distance/ wheelCircumference; //distance / circumference (inches)
         int targetTicks = (int)(rotations*ticksPerRev);
-
-
+        robot.stopAndResetEncoders();
+        robot.useEncoders(true);
 
         if(opModeIsActive()) {
-            robot.RL.setTargetPosition(targetTicks);
-            robot.RR.setTargetPosition(targetTicks);
-            robot.FL.setTargetPosition(targetTicks);
-            robot.FR.setTargetPosition(targetTicks);
-
-            robot.RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
+            robot.setAllTargetPosition(targetTicks);
+            robot.RUN_TO_POSITION();
             robot.setAllGivenPower(power);
-
             double startAngle = robot.getAngle();
-
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes working
                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
@@ -442,14 +425,10 @@ public class AutoTemplate2 extends LinearOpMode {
             }
 
             robot.stopMotors();
-
             telemetry.addData("Path", "Complete");
             telemetry.update();
-
-            robot.useEncoders(true);
         }
     }
-
 
     public void strafeEnc(double power, double distance) {
         robot.stopAndResetEncoders();
@@ -577,11 +556,10 @@ public class AutoTemplate2 extends LinearOpMode {
         robot.initMotors(hardwareMap);
         robot.initServos(hardwareMap);//servo
         robot.initIMU(hardwareMap);//gyro
-
-        detector.setOffset(-1.4f/8f, 1.7f/8f);
-        detector.camSetup(hardwareMap);
-
         robot.useEncoders(true);
+
+        detector.setOffset(0f/8f, 1.7f/8f);
+        detector.camSetup(hardwareMap);
 
 //        telemetry.addData("Mode", "calibrating...");
 //        telemetry.update();

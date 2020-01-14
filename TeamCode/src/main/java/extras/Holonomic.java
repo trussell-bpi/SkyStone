@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,7 +16,7 @@ import pkg3939.Robot3939;
  */
 
 @TeleOp(name="Holonomic", group="Iterative Opmode")
-//@Disabled
+@Disabled
 public class Holonomic extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
