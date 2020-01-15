@@ -76,7 +76,7 @@ public class AutoTemplate2 extends LinearOpMode {
 
     private DistanceSensor sensorRange;
     private final double gearRatio = 2/1;//2:1
-    private final double ticksPerRev = 537.6 * gearRatio;
+    private final double ticksPerRev = 383.6 * gearRatio;
     private final double wheelCircumference = 3.1415 * robot.wheelDiameter; //pi * diameter (inches)
 
     public void rotate(double power, double time) {
@@ -597,6 +597,9 @@ public class AutoTemplate2 extends LinearOpMode {
 
             moveEncoderDifferential(32);
             moveEncoderDifferential(-32);
+            mySleep(3);
+            moveDistanceEnc(1, 32);
+            moveDistanceEnc(1, -32);
 
             // Rev2mDistanceSensor specific methods.
             telemetry.addData("ID", String.format("%x", sensorTimeOfFlight.getModelID()));

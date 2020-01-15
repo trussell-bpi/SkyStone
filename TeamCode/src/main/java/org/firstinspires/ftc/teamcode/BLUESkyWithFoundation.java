@@ -72,7 +72,7 @@ public class BLUESkyWithFoundation extends LinearOpMode {
     private ElapsedTime     runtime = new ElapsedTime();
 
     private final double gearRatio = 2/1;//2:1
-    private final double ticksPerRev = 537.6 * gearRatio;
+    private final double ticksPerRev = 383.6 * gearRatio;
     private final double wheelCircumference = 3.1415 * robot.wheelDiameter; //pi * diameter (inches)
 
     public void rotate(double power, double time) {
@@ -788,7 +788,7 @@ public class BLUESkyWithFoundation extends LinearOpMode {
             robot.leftSlides.setPower(-0.3);//hold
             robot.rightSlides.setPower(-0.3);
             moveEncoderDifferential(-6, 0.8);
-            rotateEnc(1970, 1.69);//turn left 90 degrees
+            rotateEnc(1300, 1.69);//turn left 90 degrees
 
             if(vals[0] == 0){//middle
                 moveEncoderDifferential(87, 3.3);//run to foundation side
@@ -802,7 +802,7 @@ public class BLUESkyWithFoundation extends LinearOpMode {
             mySleep(0.15);
             robot.leftSlides.setPower(-0.3);//slides hold
             robot.rightSlides.setPower(-0.3);
-            rotateEnc(-1970, 1.69);//turn left 90 degrees
+            rotateEnc(-1300, 1.69);//turn left 90 degrees
             moveEncoderDifferential(9, 1.2);//push against foundation
             robot.leftSlides.setPower(-0.1);
             robot.rightSlides.setPower(-0.1);//drop slides
