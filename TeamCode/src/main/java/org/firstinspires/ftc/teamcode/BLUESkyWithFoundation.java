@@ -520,8 +520,6 @@ public class BLUESkyWithFoundation extends LinearOpMode {
         double rotations = distance/ wheelCircumference; //distance / circumference (inches)
         int targetTicks = (int)(rotations*ticksPerRev);
 
-
-
         if(opModeIsActive()) {
             robot.RL.setTargetPosition(targetTicks);
             robot.RR.setTargetPosition(targetTicks);
@@ -601,7 +599,7 @@ public class BLUESkyWithFoundation extends LinearOpMode {
     }
 
     public void strafeEncoderDifferential(double distance) {
-        double k = 0.0004;
+        double k = 0.0005;
         double minSpeed = 0.2;
         double startSpeed = 0.6;
 
@@ -611,12 +609,9 @@ public class BLUESkyWithFoundation extends LinearOpMode {
         double rotations = distance/ wheelCircumference; //distance / circumference (inches)
         int targetTicks = (int)(rotations*ticksPerRev);
 
-        double tickAvg = (int)((robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4);
+        double tickAvg = (robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4;
         double tickDifference = targetTicks - tickAvg;
         double power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, startSpeed);
-
-        if(tickDifference < 0)
-            power = -power;
 
         if(opModeIsActive()) {
             robot.RL.setTargetPosition(-targetTicks);
@@ -624,10 +619,7 @@ public class BLUESkyWithFoundation extends LinearOpMode {
             robot.FL.setTargetPosition(targetTicks);
             robot.FR.setTargetPosition(-targetTicks);
 
-            robot.RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.RUN_TO_POSITION();
 
             robot.setAllGivenPower(power);
 
@@ -639,11 +631,10 @@ public class BLUESkyWithFoundation extends LinearOpMode {
                 if(runtime.seconds() > 5)//fail safe, in case of infinite loop
                     break;
 
-
                 tickAvg = (int)((Math.abs(robot.FL.getCurrentPosition()) + Math.abs(robot.FR.getCurrentPosition()) + Math.abs(robot.RL.getCurrentPosition()) + Math.abs(robot.RR.getCurrentPosition()))/4.0);
                 tickDifference = targetTicks - tickAvg;
 
-                if(runtime.seconds() < 0.3)
+                if(runtime.seconds() < 0.5)
                     power = startSpeed;
                 else
                     power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, 1);
@@ -651,12 +642,10 @@ public class BLUESkyWithFoundation extends LinearOpMode {
 
 
 //                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
-//                robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-//                robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-//                robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-//                robot.RL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-
-                robot.setAllGivenPower(power);
+//                robot.FL.setPower(Range.clip(power - correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.FR.setPower(Range.clip(power + correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.RR.setPower(Range.clip(power + correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.RL.setPower(Range.clip(power - correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
 
                 telemetry.addData("Path", "Driving "+distance+" inches");
                 telemetry.addData("tickDifference", tickDifference);
@@ -673,6 +662,80 @@ public class BLUESkyWithFoundation extends LinearOpMode {
             robot.useEncoders(true);
         }
     }
+
+//    public void strafeEncoderDifferential(double distance) {
+//        double k = 0.0004;
+//        double minSpeed = 0.2;
+//        double startSpeed = 0.6;
+//
+//        robot.stopAndResetEncoders();
+//        robot.useEncoders(true);
+//
+//        double rotations = distance/ wheelCircumference; //distance / circumference (inches)
+//        int targetTicks = (int)(rotations*ticksPerRev);
+//
+//        double tickAvg = (int)((robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4);
+//        double tickDifference = targetTicks - tickAvg;
+//        double power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, startSpeed);
+//
+//        if(tickDifference < 0)
+//            power = -power;
+//
+//        if(opModeIsActive()) {
+//            robot.RL.setTargetPosition(-targetTicks);
+//            robot.RR.setTargetPosition(targetTicks);
+//            robot.FL.setTargetPosition(targetTicks);
+//            robot.FR.setTargetPosition(-targetTicks);
+//
+//            robot.RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            robot.FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            robot.RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            robot.FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//
+//            robot.setAllGivenPower(power);
+//
+//            double startAngle = robot.getAngle();
+//
+//            while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
+//                //wait till motor finishes
+//
+//                if(runtime.seconds() > 5)//fail safe, in case of infinite loop
+//                    break;
+//
+//
+//                tickAvg = (int)((Math.abs(robot.FL.getCurrentPosition()) + Math.abs(robot.FR.getCurrentPosition()) + Math.abs(robot.RL.getCurrentPosition()) + Math.abs(robot.RR.getCurrentPosition()))/4.0);
+//                tickDifference = targetTicks - tickAvg;
+//
+//                if(runtime.seconds() < 0.3)
+//                    power = startSpeed;
+//                else
+//                    power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, 1);
+//
+//
+//
+////                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
+////                robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+////                robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+////                robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+////                robot.RL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//
+//                robot.setAllGivenPower(power);
+//
+//                telemetry.addData("Path", "Driving "+distance+" inches");
+//                telemetry.addData("tickDifference", tickDifference);
+//                telemetry.addData("power", power);
+//                telemetry.update();
+//            }
+//
+//            robot.stopMotors();
+//            mySleep(0.5);
+//
+//            telemetry.addData("Path", "Complete");
+//            telemetry.update();
+//
+//            robot.useEncoders(true);
+//        }
+//    }
 
     public void moveSlides(double power, int constant) {
         if (opModeIsActive()) {
@@ -788,6 +851,8 @@ public class BLUESkyWithFoundation extends LinearOpMode {
             robot.leftSlides.setPower(-0.3);//hold
             robot.rightSlides.setPower(-0.3);
             moveEncoderDifferential(-6, 0.8);
+
+
             rotateEnc(1300, 1.69);//turn left 90 degrees
 
             if(vals[0] == 0){//middle

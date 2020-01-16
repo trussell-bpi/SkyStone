@@ -788,7 +788,7 @@ public class REDSkyWithFoundation extends LinearOpMode {
             robot.leftSlides.setPower(-0.3);//hold
             robot.rightSlides.setPower(-0.3);
             moveEncoderDifferential(-6, 0.8);
-            rotateEnc(-1970, 1.5);
+            rotateEnc(-1405, 1.5);
 
             if(vals[0] == 0){//middle
                 moveEncoderDifferential(87, 3.3);//run to foundation side
@@ -802,7 +802,7 @@ public class REDSkyWithFoundation extends LinearOpMode {
             mySleep(0.15);
             robot.leftSlides.setPower(-0.3);//slides hold
             robot.rightSlides.setPower(-0.3);
-            rotateEnc(1970, 1.5);
+            rotateEnc(1405, 1.5);
             moveEncoderDifferential(9, 1.2);//push against foundation
             robot.leftSlides.setPower(-0.1);
             robot.rightSlides.setPower(-0.1);//drop slides

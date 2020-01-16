@@ -259,6 +259,7 @@ public class AutoTemplate2 extends LinearOpMode {
     }
 
     public void strafeGyro(double power, double time) {//uses gyro to make sure robot's angle stays the same - prevents unintentional rotation
+        robot.useEncoders(false);
         double startAngle = robot.getAngle();
         robot.FLpower = +power;
         robot.FRpower = -power;
@@ -339,7 +340,7 @@ public class AutoTemplate2 extends LinearOpMode {
         int currentTickAvg = (robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4;
         double tickDifference = targetTicks - currentTickAvg;
         double power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, startSpeed);
-        double failsafe = 1/26*Math.abs(distance) + 2;
+        double failsafe = 1/26*Math.abs(distance) + 3;
 
         robot.stopAndResetEncoders();
         robot.useEncoders(true);
@@ -371,15 +372,11 @@ public class AutoTemplate2 extends LinearOpMode {
                 else
                     power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, 1);
 
-//                if(tickDifference < 0)
-//                    power = -power;
-//                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
-//                robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-//                robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-//                robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-//                robot.RL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-
-                robot.setAllGivenPower(power);
+                double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
+                robot.FL.setPower(Range.clip(power - correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+                robot.FR.setPower(Range.clip(power + correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+                robot.RR.setPower(Range.clip(power + correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+                robot.RL.setPower(Range.clip(power - correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
 
                 telemetry.addData("Path", "Driving "+distance+" inches");
                 telemetry.addData("target ticks", targetTicks);
@@ -432,7 +429,6 @@ public class AutoTemplate2 extends LinearOpMode {
 
     public void strafeEnc(double power, double distance) {
         robot.stopAndResetEncoders();
-
         robot.useEncoders(true);
 
         double rotations = distance/ wheelCircumference; //distance / circumference (inches)
@@ -444,10 +440,7 @@ public class AutoTemplate2 extends LinearOpMode {
             robot.FL.setTargetPosition(targetTicks);
             robot.FR.setTargetPosition(-targetTicks);
 
-            robot.RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.RUN_TO_POSITION();
 
             robot.setAllGivenPower(power);
 
@@ -474,7 +467,7 @@ public class AutoTemplate2 extends LinearOpMode {
     }
 
     public void strafeEncoderDifferential(double distance) {
-        double k = 0.0004;
+        double k = 0.0005;
         double minSpeed = 0.2;
         double startSpeed = 0.6;
 
@@ -484,12 +477,9 @@ public class AutoTemplate2 extends LinearOpMode {
         double rotations = distance/ wheelCircumference; //distance / circumference (inches)
         int targetTicks = (int)(rotations*ticksPerRev);
 
-        double tickAvg = (int)((robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4);
+        double tickAvg = (robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4;
         double tickDifference = targetTicks - tickAvg;
         double power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, startSpeed);
-
-        if(tickDifference < 0)
-            power = -power;
 
         if(opModeIsActive()) {
             robot.RL.setTargetPosition(-targetTicks);
@@ -497,10 +487,7 @@ public class AutoTemplate2 extends LinearOpMode {
             robot.FL.setTargetPosition(targetTicks);
             robot.FR.setTargetPosition(-targetTicks);
 
-            robot.RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.RUN_TO_POSITION();
 
             robot.setAllGivenPower(power);
 
@@ -512,11 +499,10 @@ public class AutoTemplate2 extends LinearOpMode {
                 if(runtime.seconds() > 5)//fail safe, in case of infinite loop
                     break;
 
-
                 tickAvg = (int)((Math.abs(robot.FL.getCurrentPosition()) + Math.abs(robot.FR.getCurrentPosition()) + Math.abs(robot.RL.getCurrentPosition()) + Math.abs(robot.RR.getCurrentPosition()))/4.0);
                 tickDifference = targetTicks - tickAvg;
 
-                if(runtime.seconds() < 0.3)
+                if(runtime.seconds() < 0.5)
                     power = startSpeed;
                 else
                     power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, 1);
@@ -524,12 +510,10 @@ public class AutoTemplate2 extends LinearOpMode {
 
 
 //                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
-//                robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-//                robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-//                robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-//                robot.RL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-
-                robot.setAllGivenPower(power);
+//                robot.FL.setPower(Range.clip(power - correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.FR.setPower(Range.clip(power + correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.RR.setPower(Range.clip(power + correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+//                robot.RL.setPower(Range.clip(power - correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
 
                 telemetry.addData("Path", "Driving "+distance+" inches");
                 telemetry.addData("tickDifference", tickDifference);
@@ -596,10 +580,16 @@ public class AutoTemplate2 extends LinearOpMode {
 //            telemetry.addData("range", String.format("%.01f in", sensorRange.getDistance(DistanceUnit.INCH)));
 
             moveEncoderDifferential(32);
-            moveEncoderDifferential(-32);
-            mySleep(3);
-            moveDistanceEnc(1, 32);
-            moveDistanceEnc(1, -32);
+            moveEncoderDifferential(-10 );
+//            mySleep(3);
+//            moveDistanceEnc(1, 32);
+//            moveDistanceEnc(1, -32);
+//            mySleep(3);
+//            strafeGyro(-1, 3);
+//            strafeGyro(1, 3);
+
+            strafeEnc(1, -50);
+            strafeEnc(1, 50);
 
             // Rev2mDistanceSensor specific methods.
             telemetry.addData("ID", String.format("%x", sensorTimeOfFlight.getModelID()));
