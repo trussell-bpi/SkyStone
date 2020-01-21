@@ -76,6 +76,11 @@ public class Robot3939 {
         rightSlides.setPower(HOLD_POWER);
     }
 
+    public void setSlides(double power) {
+        leftSlides.setPower(power);
+        rightSlides.setPower(power);
+    }
+
     public void setFront(HardwareMap hwmap) {
         RL.setDirection(DcMotorSimple.Direction.REVERSE);
         FL.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -317,18 +322,48 @@ public class Robot3939 {
         leftServoUp();
     }
 
+    public void hingeWork() {
+        hinge.setPosition(0.72);
+    }
 
+    public void hingeHome() {
+        hinge.setPosition(0.06);
+    }
+
+    public void hingeSide() {
+        hinge.setPosition(0.39);
+    }
+
+
+    int hingePos = 0;//0 = home, 1 = side, 2 = work
     public void setHinge(boolean b2Pressed) {
         if(!b2Held && b2Pressed) {
             b2Held = true;
-            hingeTurn = !hingeTurn;
+
+            //code
+            hingePos++;
+            if(hingePos > 2)
+                hingePos = 0;
+
+//            hingeTurn = !hingeTurn;
         } else if(!b2Pressed)
             b2Held = false;
 
-        if(hingeTurn)//work mode
-            hinge.setPosition(0.72);
-        else//home mode
-            hinge.setPosition(0.04);
+        switch(hingePos) {
+            case 0:
+                hingeHome();//home
+                break;
+            case 1:
+                hingeSide();//side
+                break;
+            case 2:
+                hingeWork();//work
+                break;
+        }
+//        if(hingeTurn)//work mode
+//            hinge.setPosition(0.72);
+//        else//home mode
+//            hinge.setPosition(0.04);
     }
 
     public void stoneArmDown() {

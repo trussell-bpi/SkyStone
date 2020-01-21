@@ -448,11 +448,11 @@ public class AutoTemplate2 extends LinearOpMode {
 
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes working
-                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
-                robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-                robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-                robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-                robot.RL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+                double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
+                robot.FL.setPower(Range.clip(power - correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+                robot.FR.setPower(Range.clip(power + correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+                robot.RR.setPower(Range.clip(power + correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+                robot.RL.setPower(Range.clip(power - correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
                 telemetry.addData("Path", "Driving "+distance+" inches");
                 telemetry.update();
             }
@@ -556,7 +556,7 @@ public class AutoTemplate2 extends LinearOpMode {
 //        telemetry.addData("Mode", "waiting for start");
 //        telemetry.addData("imu calib status", robot.imu.getCalibrationStatus().toString());
         // you can use this as a regular DistanceSensor.
-        sensorRange = hardwareMap.get(DistanceSensor.class, "2Msensor1");
+        //sensorRange = hardwareMap.get(DistanceSensor.class, "2Msensor1");
 
         // you can also cast this to a Rev2mDistanceSensor if you want to use added
         // methods associated with the Rev2mDistanceSensor class.

@@ -72,7 +72,7 @@ public class PARKRight extends LinearOpMode {
     private ElapsedTime     runtime = new ElapsedTime();
 
     private final double gearRatio = 2/1;//2:1
-    private final double ticksPerRev = 537.6 * gearRatio;
+    private final double ticksPerRev = 383.6 * gearRatio;
     private final double wheelCircumference = 3.1415 * robot.wheelDiameter; //pi * diameter (inches)
 
     public void rotate(double power, double time) {

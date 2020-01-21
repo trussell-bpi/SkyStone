@@ -287,26 +287,29 @@ public class BLUESkyWithFoundation extends LinearOpMode {
 
     }
 
+    public void strafeGyroWhileExtending(double power, double time) {
+
+    }
+
     public void moveDistanceGyro(double power, double time) {
         double startAngle = robot.getAngle();
-        robot.FL.setPower(-power);
-        robot.FR.setPower(-power);
-        robot.RL.setPower(-power);
-        robot.RR.setPower(-power);
+        robot.FL.setPower(power);
+        robot.FR.setPower(power);
+        robot.RL.setPower(power);
+        robot.RR.setPower(power);
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < time)) {//we get on the train together
             double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
-            robot.FL.setPower(-power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-            robot.FR.setPower(-power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-            robot.RR.setPower(-power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-            robot.RL.setPower(-power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+            robot.FL.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+            robot.FR.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+            robot.RR.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+            robot.RL.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
             telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();
         }
 
         robot.setAllGivenPower(0);
         mySleep(0.2);
-
     }
 
     public void mySleep(double time) {//seconds
@@ -512,6 +515,7 @@ public class BLUESkyWithFoundation extends LinearOpMode {
 
         }
     }
+
     public void moveDistanceEnc(double power, double distance) {
         robot.stopAndResetEncoders();
 
@@ -557,7 +561,6 @@ public class BLUESkyWithFoundation extends LinearOpMode {
 
     public void strafeEnc(double power, double distance) {
         robot.stopAndResetEncoders();
-
         robot.useEncoders(true);
 
         double rotations = distance/ wheelCircumference; //distance / circumference (inches)
@@ -569,10 +572,7 @@ public class BLUESkyWithFoundation extends LinearOpMode {
             robot.FL.setTargetPosition(targetTicks);
             robot.FR.setTargetPosition(-targetTicks);
 
-            robot.RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.RUN_TO_POSITION();
 
             robot.setAllGivenPower(power);
 
@@ -581,10 +581,10 @@ public class BLUESkyWithFoundation extends LinearOpMode {
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes working
                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
-                robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-                robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-                robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-                robot.RL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+                robot.FL.setPower(Range.clip(power - correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+                robot.FR.setPower(Range.clip(power + correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+                robot.RR.setPower(Range.clip(power + correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+                robot.RL.setPower(Range.clip(power - correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
                 telemetry.addData("Path", "Driving "+distance+" inches");
                 telemetry.update();
             }
@@ -602,16 +602,15 @@ public class BLUESkyWithFoundation extends LinearOpMode {
         double k = 0.0005;
         double minSpeed = 0.2;
         double startSpeed = 0.6;
-
-        robot.stopAndResetEncoders();
-        robot.useEncoders(true);
-
         double rotations = distance/ wheelCircumference; //distance / circumference (inches)
         int targetTicks = (int)(rotations*ticksPerRev);
 
         double tickAvg = (robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4;
         double tickDifference = targetTicks - tickAvg;
         double power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, startSpeed);
+
+        robot.stopAndResetEncoders();
+        robot.useEncoders(true);
 
         if(opModeIsActive()) {
             robot.RL.setTargetPosition(-targetTicks);
@@ -623,23 +622,20 @@ public class BLUESkyWithFoundation extends LinearOpMode {
 
             robot.setAllGivenPower(power);
 
-            double startAngle = robot.getAngle();
+            //double startAngle = robot.getAngle();
 
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes
 
-                if(runtime.seconds() > 5)//fail safe, in case of infinite loop
+                if(runtime.seconds() > 4)//fail safe, in case of infinite loop
                     break;
 
-                tickAvg = (int)((Math.abs(robot.FL.getCurrentPosition()) + Math.abs(robot.FR.getCurrentPosition()) + Math.abs(robot.RL.getCurrentPosition()) + Math.abs(robot.RR.getCurrentPosition()))/4.0);
-                tickDifference = targetTicks - tickAvg;
+                tickDifference = Math.abs(targetTicks - robot.RR.getCurrentPosition());
 
                 if(runtime.seconds() < 0.5)
                     power = startSpeed;
                 else
-                    power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, 1);
-
-
+                    power = Range.clip(k*tickDifference + minSpeed, minSpeed, 1);
 
 //                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
 //                robot.FL.setPower(Range.clip(power - correction, -1, 1));//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
@@ -780,6 +776,37 @@ public class BLUESkyWithFoundation extends LinearOpMode {
         }
     }
 
+    public void moveDistanceGyroWhileExtending(double power, double time)   {
+        double startAngle = robot.getAngle();
+        robot.FL.setPower(power);
+        robot.FR.setPower(power);
+        robot.RL.setPower(power);
+        robot.RR.setPower(power);
+        runtime.reset();
+        robot.setSlidesPower(-1);
+        while (opModeIsActive() && (runtime.seconds() < time)) {//we get on the train together
+            double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
+            double extendTime = Math.round(runtime.milliseconds());
+            if(550 > extendTime && extendTime < 450) {
+                robot.setSlidesPower(-0.3);
+                robot.hinge.setPosition(0.72);
+                mySleep(0.4);
+                robot.stoneArm.setPosition(0.26);
+                mySleep(0.5);
+                robot.leftSlides.setPower(0);
+                robot.rightSlides.setPower(0);
+            }
+            robot.FL.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+            robot.FR.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+            robot.RR.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+            robot.RL.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
+            telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
+            telemetry.update();
+        }
+
+        robot.setAllGivenPower(0);
+    }
+
     @Override
     public void runOpMode() {
         /*
@@ -796,16 +823,16 @@ public class BLUESkyWithFoundation extends LinearOpMode {
 
         robot.useEncoders(true);
 
-//        telemetry.addData("Mode", "calibrating...");
-//        telemetry.update();
-//        while (!isStopRequested() && !robot.imu.isGyroCalibrated())
-//        {
-//            sleep(50);
-//            idle();
-//        }
-//
-//        telemetry.addData("Mode", "waiting for start");
-//        telemetry.addData("imu calib status", robot.imu.getCalibrationStatus().toString());
+        telemetry.addData("Mode", "calibrating...");
+        telemetry.update();
+        while (!isStopRequested() && !robot.imu.isGyroCalibrated())
+        {
+            sleep(50);
+            idle();
+        }
+
+        telemetry.addData("Mode", "waiting for start");
+        telemetry.addData("imu calib status", robot.imu.getCalibrationStatus().toString());
         telemetry.addData("Status", "Ready to run");
         telemetry.update();
 
@@ -817,91 +844,152 @@ public class BLUESkyWithFoundation extends LinearOpMode {
             telemetry.addData("Values", vals[1] + "   " + vals[0] + "   " + vals[2]);
             telemetry.update();
 
-
             robot.foundationUp();
-            moveSlides(1, -120);
-            robot.hinge.setPosition(0.72);
-            mySleep(0.4);
-            robot.stoneArm.setPosition(0.26);
-            mySleep(0.5);
-            robot.leftSlides.setPower(0);
-            robot.rightSlides.setPower(0);
+            robot.setSlides(-1);
+            mySleep(0.35);
+            robot.hingeSide();
+            robot.stoneArmUp();
+            robot.dropSlides();
+//            moveSlides(1, -120);
 
+
+//            robot.hinge.setPosition(0.72);
+//            mySleep(0.4);
+//            robot.stoneArm.setPosition(0.26);
+//            mySleep(0.5);
+//            robot.leftSlides.setPower(0);
+//            robot.rightSlides.setPower(0);
 
             if(vals[0] == 0){//middle
-                moveEncoderDifferential(32, 1.8);
+//                moveEncoderDifferential(32, 1.8);
             } else if(vals[1] == 0) {//left
-                strafeGyro(-1, 0.42);
-                moveEncoderDifferential(32, 1.8);
+                moveEncoderDifferential(-7, 0.8);
+//                moveEncoderDifferential(32, 1.8);
             } else {//right
-                strafeGyro(1, 0.4);
-                moveEncoderDifferential(32, 1.8);
+                moveEncoderDifferential(7, 0.8);
+//                moveEncoderDifferential(32, 1.8);
             }
-
+            robot.useEncoders(false);
+            strafeGyro(-1, 1);
+            robot.stoneArmDown();
+            mySleep(0.3);
+            robot.leftSlides.setPower(-0.6);//up
+            robot.rightSlides.setPower(-0.6);
+            mySleep(0.1);
+            robot.leftSlides.setPower(-0.3);//hold
+            robot.rightSlides.setPower(-0.3);
+            strafeGyro(1, 0.4);
+            moveEncoderDifferential(-75, 4);
+            //strafeEncoderDifferential(-40);
+            //strafeEnc(1, -35);
 //            //-0.3 = hold
 //            //-0.4 = slowly up without stone
 //            //-0.45 = slowly up WITH stone
 //
             // mySleep(0.1);
-            robot.stoneArm.setPosition(0.03);
-            mySleep(0.3);
-            robot.leftSlides.setPower(-0.5);//up
-            robot.rightSlides.setPower(-0.5);
-            mySleep(0.08);
-            robot.leftSlides.setPower(-0.3);//hold
-            robot.rightSlides.setPower(-0.3);
-            moveEncoderDifferential(-6, 0.8);
-
-
-            rotateEnc(1300, 1.69);//turn left 90 degrees
-
-            if(vals[0] == 0){//middle
-                moveEncoderDifferential(87, 3.3);//run to foundation side
-            } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(80, 3.1);//run to foundation side
-            } else {//right
-                moveEncoderDifferential(95, 3.5);//run to foundation side
-            }
-            robot.leftSlides.setPower(-1);//slides going up
-            robot.rightSlides.setPower(-1);
-            mySleep(0.15);
-            robot.leftSlides.setPower(-0.3);//slides hold
-            robot.rightSlides.setPower(-0.3);
-            rotateEnc(-1300, 1.69);//turn left 90 degrees
-            moveEncoderDifferential(9, 1.2);//push against foundation
-            robot.leftSlides.setPower(-0.1);
-            robot.rightSlides.setPower(-0.1);//drop slides
-            mySleep(0.25);
-            robot.stoneArm.setPosition(0.33);//release stone
-            robot.leftSlides.setPower(-0.5);
-            robot.rightSlides.setPower(-0.5);
-            mySleep(0.15);
-            robot.leftSlides.setPower(-0.3);
-            robot.rightSlides.setPower(-0.3);
+//            robot.stoneArmDown();
+//            mySleep(0.3);
+//            robot.setSlides(-0.5);
+//            mySleep(0.08);
+//            robot.setSlides(-0.3);
+//            moveEncoderDifferential(-8, 1);
+//
+//
+//            strafeEnc(-1, -110);
+////            strafeEncoderDifferential(-100);
+//            robot.setSlides(-1);
+//            robot.setAllGivenPower(0.6);
+//            mySleep(0.15);
+//            robot.setSlides(-0.3);
+//            mySleep(0.5);
+//            robot.stopMotors();
+//            robot.setSlides(-0.1);//drop slides
+//            mySleep(0.25);
+//            robot.stoneArmUp();//release stone
+//            robot.setSlides(-0.5);
+//            mySleep(0.15);
+//            robot.setSlides(-0.3);
+//            moveEncoderDifferential(-15, 2);
+//            robot.stoneArmDown();
+//            robot.dropSlides();
+//            strafeEnc(1, 130);
 
             //foundation
-            robot.foundationDown();//lower foundation hooks
-            mySleep(0.3);
-            moveEncoderDifferential(-28, 1.4);//drag back a little
-            robot.stopMotors();//
-            robot.FL.setPower(1);//push right side of robot forward
-            robot.RL.setPower(1);
-            mySleep(1);
-            robot.stopMotors();
-            robot.setAllGivenPower(-1);
-            mySleep(0.5);
-            robot.FL.setPower(0);//stop right side of robot
-            robot.RL.setPower(0);
-            mySleep(1);
-            robot.stopMotors();
-            strafeGyro(1, 1);//strafe right to align with middle of foundation
-            moveEncoderDifferential(16, 1.2);//push forward to align with wall
-            robot.foundationUp();//release foundation
-            mySleep(0.3);
-            moveEncoderDifferential(-27, 1.4) ;//move straight back towards parking spot
-            robot.leftSlides.setPower(0);
-            robot.rightSlides.setPower(0);//release slides because going under bridge
-            moveEncoderDifferential(-20, 1.3);//move under bridge.
+//            robot.foundationDown();//lower foundation hooks
+//            mySleep(0.3);
+//            moveEncoderDifferential(-28, 1.4);//drag back a little
+//            robot.stopMotors();//
+//            robot.FL.setPower(1);//push right side of robot forward
+//            robot.RL.setPower(1);
+//            mySleep(1);
+//            robot.stopMotors();
+//            robot.setAllGivenPower(-1);
+//            mySleep(0.5);
+//            robot.FL.setPower(0);//stop right side of robot
+//            robot.RL.setPower(0);
+//            mySleep(1);
+//            robot.stopMotors();
+//            strafeGyro(1, 1);//strafe right to align with middle of foundation
+//            moveEncoderDifferential(16, 1.2);//push forward to align with wall
+//            robot.foundationUp();//release foundation
+//            mySleep(0.3);
+//            moveEncoderDifferential(-27, 1.4) ;//move straight back towards parking spot
+//            robot.leftSlides.setPower(0);
+//            robot.rightSlides.setPower(0);//release slides because going under bridge
+//            moveEncoderDifferential(-20, 1.3);//move under bridge.
+
+
+//            rotateEnc(1300, 1.69);//turn left 90 degrees
+//
+//            if(vals[0] == 0){//middle
+//                moveEncoderDifferential(87, 3.3);//run to foundation side
+//            } else if(vals[1] == 0) {//left
+//                moveEncoderDifferential(80, 3.1);//run to foundation side
+//            } else {//right
+//                moveEncoderDifferential(95, 3.5);//run to foundation side
+//            }
+//            robot.leftSlides.setPower(-1);//slides going up
+//            robot.rightSlides.setPower(-1);
+//            mySleep(0.15);
+//            robot.leftSlides.setPower(-0.3);//slides hold
+//            robot.rightSlides.setPower(-0.3);
+//            rotateEnc(-1300, 1.69);//turn left 90 degrees
+//            moveEncoderDifferential(9, 1.2);//push against foundation
+//            robot.leftSlides.setPower(-0.1);
+//            robot.rightSlides.setPower(-0.1);//drop slides
+//            mySleep(0.25);
+//            robot.stoneArm.setPosition(0.33);//release stone
+//            robot.leftSlides.setPower(-0.5);
+//            robot.rightSlides.setPower(-0.5);
+//            mySleep(0.15);
+//            robot.leftSlides.setPower(-0.3);
+//            robot.rightSlides.setPower(-0.3);
+//
+//            //foundation
+//            robot.foundationDown();//lower foundation hooks
+//            mySleep(0.3);
+//            moveEncoderDifferential(-28, 1.4);//drag back a little
+//            robot.stopMotors();//
+//            robot.FL.setPower(1);//push right side of robot forward
+//            robot.RL.setPower(1);
+//            mySleep(1);
+//            robot.stopMotors();
+//            robot.setAllGivenPower(-1);
+//            mySleep(0.5);
+//            robot.FL.setPower(0);//stop right side of robot
+//            robot.RL.setPower(0);
+//            mySleep(1);
+//            robot.stopMotors();
+//            strafeGyro(1, 1);//strafe right to align with middle of foundation
+//            moveEncoderDifferential(16, 1.2);//push forward to align with wall
+//            robot.foundationUp();//release foundation
+//            mySleep(0.3);
+//            moveEncoderDifferential(-27, 1.4) ;//move straight back towards parking spot
+//            robot.leftSlides.setPower(0);
+//            robot.rightSlides.setPower(0);//release slides because going under bridge
+//            moveEncoderDifferential(-20, 1.3);//move under bridge.
+
+            //old foundation
 //            robot.FL.setPower(-1);//pull right side of the robot back
 //            robot.RL.setPower(-1);
 //            mySleep(1.4);
