@@ -22,6 +22,7 @@ public class Robot3939 {
     public Servo bar;//foundation mover servo
     public Servo stoneArm;
     public Servo hinge;
+    public Servo capstone;
 
     public BNO055IMU imu;//gyro
     private Orientation lastAngles = new Orientation();//saves angles
@@ -29,6 +30,7 @@ public class Robot3939 {
 
     public double FLpower, FRpower, RLpower, RRpower;//power of the motors
     public double speed = 10.0;
+    public boolean capstoneUp = true;
 
     public static final double HOLD_POWER = -0.3;
     public static final double minSpeed = 0.10;
@@ -93,6 +95,7 @@ public class Robot3939 {
         servoLeft = hwmap.servo.get("servoLeft");//right foundation
         stoneArm = hwmap.servo.get("stoneArm");
         hinge = hwmap.servo.get("hinge");
+        capstone = hwmap.servo.get("capstone");
     }
 
     public void initIMU(HardwareMap hwmap) {
@@ -121,6 +124,16 @@ public class Robot3939 {
             FL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             RR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             FR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+    }
+
+    public void useSlideEncoders(boolean status) {
+        if(status) {
+            leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        } else {
+            leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
 
@@ -322,6 +335,14 @@ public class Robot3939 {
         leftServoUp();
     }
 
+    public void capstoneDown() {
+        capstone.setPosition(0.5);
+    }
+
+    public void capstoneUp() {
+        capstone.setPosition(0);
+    }
+
     public void hingeWork() {
         hinge.setPosition(0.72);
     }
@@ -351,13 +372,13 @@ public class Robot3939 {
 
         switch(hingePos) {
             case 0:
-                hingeHome();//home
+                hingeWork();//home
                 break;
             case 1:
                 hingeSide();//side
                 break;
             case 2:
-                hingeWork();//work
+                hingeHome();//work
                 break;
         }
 //        if(hingeTurn)//work mode
@@ -386,7 +407,6 @@ public class Robot3939 {
         else//down
             stoneArm.setPosition(0.00 );
     }
-
 
     public void hookFoundation(boolean aPressed) {
         if (!aHeld && aPressed) {
@@ -446,7 +466,7 @@ public class Robot3939 {
         // The gain value determines how sensitive the correction is to direction changes.
         // You will have to experiment with your robot to get small smooth direction changes
         // to stay on a straight line.
-        double correction, angle, gain = .125 * power;
+        double correction, angle, gain = .1 * power;
 
         angle = getAngle();
 

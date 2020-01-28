@@ -88,6 +88,8 @@ public class HolonomicGyro extends LinearOpMode {
         boolean y2Held = false;
         boolean useNormal = true;
         boolean initIMU = true;
+        boolean xHeld = false;
+        boolean capstoneUp = false;
 
         waitForStart();
         runtime.reset();
@@ -116,6 +118,7 @@ public class HolonomicGyro extends LinearOpMode {
                 //elevate slightly to move stone under bridge
                 if (!y2Held && gamepad2.y) {
                     y2Held = true;
+                    robot.useSlideEncoders(false);
                     robot.leftSlides.setPower(-0.5);
                     robot.rightSlides.setPower(-0.5);
                     mySleep(0.1);
@@ -124,6 +127,18 @@ public class HolonomicGyro extends LinearOpMode {
                 } else if (!gamepad2.y) {
                     y2Held = false;
                 }
+
+                if(!xHeld && gamepad1.x) {
+                    xHeld = true;
+                    robot.capstoneUp = !robot.capstoneUp;
+                } else if(!gamepad1.x)
+                    xHeld = false;
+
+
+                if(robot.capstoneUp) {
+                    robot.capstoneUp();
+                } else
+                    robot.capstoneDown();
 
                 //press to switch between Gyro and Normal Drive
                 if (!yHeld && gamepad1.y) {
@@ -161,6 +176,7 @@ public class HolonomicGyro extends LinearOpMode {
                 telemetry.addData("RX", gamepad1.right_stick_x);
 
                 telemetry.addData("speed", robot.speed);
+                telemetry.addData("capstone", robot.capstone.getPosition());
                 telemetry.addData("left servo", robot.servoLeft.getPosition());
                 telemetry.addData("right servo", robot.servoRight.getPosition());
                 telemetry.addData("hinge", robot.hinge.getPosition());
