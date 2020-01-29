@@ -645,80 +645,6 @@ public class BLUESkyWithFoundation2 extends LinearOpMode {
         }
     }
 
-//    public void strafeEncoderDifferential(double distance) {
-//        double k = 0.0004;
-//        double minSpeed = 0.2;
-//        double startSpeed = 0.6;
-//
-//        robot.stopAndResetEncoders();
-//        robot.useEncoders(true);
-//
-//        double rotations = distance/ wheelCircumference; //distance / circumference (inches)
-//        int targetTicks = (int)(rotations*ticksPerRev);
-//
-//        double tickAvg = (int)((robot.FL.getCurrentPosition() + robot.FR.getCurrentPosition() + robot.RL.getCurrentPosition() + robot.RR.getCurrentPosition())/4);
-//        double tickDifference = targetTicks - tickAvg;
-//        double power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, startSpeed);
-//
-//        if(tickDifference < 0)
-//            power = -power;
-//
-//        if(opModeIsActive()) {
-//            robot.RL.setTargetPosition(-targetTicks);
-//            robot.RR.setTargetPosition(targetTicks);
-//            robot.FL.setTargetPosition(targetTicks);
-//            robot.FR.setTargetPosition(-targetTicks);
-//
-//            robot.RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            robot.FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            robot.RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            robot.FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//
-//            robot.setAllGivenPower(power);
-//
-//            double startAngle = robot.getAngle();
-//
-//            while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
-//                //wait till motor finishes
-//
-//                if(runtime.seconds() > 5)//fail safe, in case of infinite loop
-//                    break;
-//
-//
-//                tickAvg = (int)((Math.abs(robot.FL.getCurrentPosition()) + Math.abs(robot.FR.getCurrentPosition()) + Math.abs(robot.RL.getCurrentPosition()) + Math.abs(robot.RR.getCurrentPosition()))/4.0);
-//                tickDifference = targetTicks - tickAvg;
-//
-//                if(runtime.seconds() < 0.3)
-//                    power = startSpeed;
-//                else
-//                    power = Range.clip(k*Math.abs(tickDifference) + minSpeed, minSpeed, 1);
-//
-//
-//
-////                 double correction = robot.getCorrection(startAngle, Math.abs(power));//check if someone is pushing you
-////                robot.FL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-////                robot.FR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-////                robot.RR.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-////                robot.RL.setPower(power - correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
-//
-//                robot.setAllGivenPower(power);
-//
-//                telemetry.addData("Path", "Driving "+distance+" inches");
-//                telemetry.addData("tickDifference", tickDifference);
-//                telemetry.addData("power", power);
-//                telemetry.update();
-//            }
-//
-//            robot.stopMotors();
-//            mySleep(0.5);
-//
-//            telemetry.addData("Path", "Complete");
-//            telemetry.update();
-//
-//            robot.useEncoders(true);
-//        }
-//    }
-
     public void moveSlides(double power, int constant) {
         if (opModeIsActive()) {
             robot.leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -839,9 +765,9 @@ public class BLUESkyWithFoundation2 extends LinearOpMode {
 //            robot.rightSlides.setPower(0);
 
             if(vals[0] == 0){//middle
-//                moveEncoderDifferential(32, 1.8);
+                moveEncoderDifferential(25, 2);
             } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(-7, 0.8);
+                moveEncoderDifferential(13, 1.8);
 //                moveEncoderDifferential(32, 1.8);
             } else {//right
                 moveEncoderDifferential(7, 0.8);
@@ -852,7 +778,7 @@ public class BLUESkyWithFoundation2 extends LinearOpMode {
             robot.hingeSide();
             robot.stoneArmUp();
             robot.dropSlides();
-            strafeEncoderDifferential(-38);
+            strafeEncoderDifferential(-39);
             robot.stoneArmDown();
             mySleep(0.3);
             robot.setSlides(-0.6);
@@ -862,17 +788,18 @@ public class BLUESkyWithFoundation2 extends LinearOpMode {
             strafeEncoderDifferential(10);
 
             if(vals[0] == 0){//middle
-                moveEncoderDifferential(-77, 4);
+                moveEncoderDifferential(-101, 5);
             } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(-70, 4);
+                moveEncoderDifferential(-97, 5);
             } else {//right
-                moveEncoderDifferential(-84, 4);
+                moveEncoderDifferential(-86, 5);
             }
             robot.setSlides(-1);
             mySleep(0.15);
             robot.setSlides(-0.3);
-            strafeEncoderDifferential(-14);//move to foundation
+            strafeEncoderDifferential(-14.2);//move to foundation
             robot.stoneArmUp();
+            mySleep(0.2);
             strafeEncoderDifferential(16);//move away from foundation
             robot.stoneArmDown();
             robot.setSlides(0);
@@ -880,24 +807,24 @@ public class BLUESkyWithFoundation2 extends LinearOpMode {
 
             //running back to grab second stone
             if(vals[0] == 0){//middle
-                moveEncoderDifferential(100, 5);//move to second stone
+                moveEncoderDifferential(77, 4);//move to second stone
             } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(95, 5);
+                moveEncoderDifferential(70, 4);
             } else {//right
-                moveEncoderDifferential(109, 5);
+                //moveEncoderDifferential(109, 5);
             }
             robot.stoneArmUp();
-            strafeEncoderDifferential(-13);//move to stone
+            strafeEncoderDifferential(-14);//move to stone
             robot.stoneArmDown();
             mySleep(0.3);
             robot.setSlides(-0.6);
             mySleep(0.1);
             robot.setSlides(-0.3);
-            strafeEncoderDifferential(13);//move away from stone
+            strafeEncoderDifferential(14);//move away from stone
             if(vals[0] == 0){//middle
-                moveEncoderDifferential(-105, 5);//move to building site
+                moveEncoderDifferential(-77, 5);//move to building site
             } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(-95, 5);
+                moveEncoderDifferential(-70, 5);
             } else {//right
                 moveEncoderDifferential(-109, 5);
             }
@@ -907,7 +834,7 @@ public class BLUESkyWithFoundation2 extends LinearOpMode {
             robot.setSlides(-0.3);
             moveEncoderDifferential(15, 2);
             robot.foundationDown();
-            robot.stoneArmUp();
+            robot.stoneArmUp();//drop second stone
             robot.useEncoders(false);
             robot.setAllGivenPower(-1);
             mySleep(0.25);

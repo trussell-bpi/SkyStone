@@ -827,7 +827,7 @@ public class BLUESkyWithFoundation extends LinearOpMode {
         detector.camSetup(hardwareMap);
 
         robot.useEncoders(true);
-        robot.useSlideEncoders(false);
+
 
         telemetry.addData("Mode", "calibrating...");
         telemetry.update();
@@ -867,36 +867,42 @@ public class BLUESkyWithFoundation extends LinearOpMode {
                 moveEncoderDifferential(7, 0.8);
 //                moveEncoderDifferential(32, 1.8);
             }
+            robot.useSlideEncoders(true);
             robot.setSlides(-1);
-            mySleep(0.35);
+            mySleep(0.4);
             robot.hingeSide();
             robot.stoneArmUp();
             robot.dropSlides();
             strafeEncoderDifferential(-38);
             robot.stoneArmDown();
             mySleep(0.3);
+            robot.useSlideEncoders(false);
             robot.setSlides(-0.6);
-            mySleep(0.1);
+            mySleep(0.12);
             robot.setSlides(-0.3);
-//            strafeGyro(1, 0.65);//move away
             strafeEncoderDifferential(10);
 
             if(vals[0] == 0){//middle
-                moveEncoderDifferential(-77, 4);
+                moveEncoderDifferential(-76, 4);
             } else if(vals[1] == 0) {//left
                 moveEncoderDifferential(-70, 4);
             } else {//right
                 moveEncoderDifferential(-84, 4);
             }
+//            robot.setSlides(-1);
+//            mySleep(0.15);
+//            robot.setSlides(-0.3);
+            robot.useSlideEncoders(true);
             robot.setSlides(-1);
             mySleep(0.15);
+            robot.useSlideEncoders(false);
             robot.setSlides(-0.3);
-            strafeEncoderDifferential(-14);//move to foundation
+            strafeEncoderDifferential(-15);//move to foundation
             robot.stoneArmUp();
+            mySleep(0.3);
             strafeEncoderDifferential(16);//move away from foundation
             robot.stoneArmDown();
             robot.setSlides(0);
-
 
             //running back to grab second stone
             if(vals[0] == 0){//middle
@@ -907,13 +913,13 @@ public class BLUESkyWithFoundation extends LinearOpMode {
                 moveEncoderDifferential(109, 5);
             }
             robot.stoneArmUp();
-            strafeEncoderDifferential(-13);//move to stone
+            strafeEncoderDifferential(-11);//move to stone
             robot.stoneArmDown();
             mySleep(0.3);
             robot.setSlides(-0.6);
             mySleep(0.1);
             robot.setSlides(-0.3);
-            strafeEncoderDifferential(13);//move away from stone
+            strafeEncoderDifferential(14);//move away from stone
             if(vals[0] == 0){//middle
                 moveEncoderDifferential(-105, 5);//move to building site
             } else if(vals[1] == 0) {//left
@@ -921,21 +927,38 @@ public class BLUESkyWithFoundation extends LinearOpMode {
             } else {//right
                 moveEncoderDifferential(-109, 5);
             }
+            robot.useSlideEncoders(true);
             robot.setSlides(-0.6);
             rotateEnc(1405, 1.6);
             robot.hingeWork();
             robot.setSlides(-0.3);
-            moveEncoderDifferential(15, 2);
+            robot.setAllGivenPower(0.5);
+            mySleep(1);
+            robot.stopMotors();
             robot.foundationDown();
             robot.stoneArmUp();
-            robot.useEncoders(false);
-            robot.setAllGivenPower(-1);
-            mySleep(0.25);
-            robot.RL.setPower(0.3);
-            robot.FL.setPower(0.3);
-            mySleep(0.7);
-            //rotateEnc(1405, 1.6);
+            mySleep(0.4);
+            moveEncoderDifferential(-35, 2.2);
             robot.foundationUp();
+            mySleep(0.3);
+            robot.useSlideEncoders(false);
+            robot.setSlides(-0.15);
+            strafeEncoderDifferential(45);
+
+//            robot.setAllGivenPower(-1);
+//            mySleep(0.6);
+//            robot.RL.setPower(0.2);
+//            robot.FL.setPower(0.2);
+//            mySleep(1);
+//            robot.setAllGivenPower(-1);
+//            mySleep((0.3));
+            //robot.setAllGivenPower(0.4);
+            //rotateEnc(1405, 1.6);
+//            robot.foundationUp();
+//            mySleep(0.3);
+//            robot.setAllGivenPower(-1);
+//            mySleep(0.8);
+//            robot.stopMotors();
             //moveEncoderDifferential(-18, 1.5);
 
 
