@@ -861,10 +861,10 @@ public class BLUESkyWithFoundation extends LinearOpMode {
             if(vals[0] == 0){//middle
 //                moveEncoderDifferential(32, 1.8);
             } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(-7, 0.8);
+                moveEncoderDifferential(-8.5, 0.8);
 //                moveEncoderDifferential(32, 1.8);
             } else {//right
-                moveEncoderDifferential(7, 0.8);
+                moveEncoderDifferential(8.5, 0.8);
 //                moveEncoderDifferential(32, 1.8);
             }
             robot.useSlideEncoders(true);
@@ -872,20 +872,21 @@ public class BLUESkyWithFoundation extends LinearOpMode {
             mySleep(0.4);
             robot.hingeSide();
             robot.stoneArmUp();
-            robot.dropSlides();
-            strafeEncoderDifferential(-38);
+            robot.useSlideEncoders(false);
+            robot.setSlides(-0.15);
+            strafeEncoderDifferential(-38);//move to stone 1
             robot.stoneArmDown();
             mySleep(0.3);
             robot.useSlideEncoders(false);
             robot.setSlides(-0.6);
             mySleep(0.12);
             robot.setSlides(-0.3);
-            strafeEncoderDifferential(10);
+            strafeEncoderDifferential(11);
 
             if(vals[0] == 0){//middle
                 moveEncoderDifferential(-76, 4);
             } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(-70, 4);
+                moveEncoderDifferential(-69, 4);
             } else {//right
                 moveEncoderDifferential(-84, 4);
             }
@@ -894,13 +895,30 @@ public class BLUESkyWithFoundation extends LinearOpMode {
 //            robot.setSlides(-0.3);
             robot.useSlideEncoders(true);
             robot.setSlides(-1);
-            mySleep(0.15);
+            mySleep(0.19);
             robot.useSlideEncoders(false);
             robot.setSlides(-0.3);
-            strafeEncoderDifferential(-15);//move to foundation
+            if(vals[0] == 0){//middle
+                strafeEncoderDifferential(-14.8);//move to foundation 1
+
+            } else if(vals[1] == 0) {//left
+                strafeEncoderDifferential(-14.3);//move to foundation 1
+
+            } else {//right
+                strafeEncoderDifferential(-14.6);//move to foundation 1
+
+            }
+
             robot.stoneArmUp();
             mySleep(0.3);
-            strafeEncoderDifferential(16);//move away from foundation
+            if(vals[0] == 0){//middle
+                strafeEncoderDifferential(15.5);//move away from foundation
+            } else if(vals[1] == 0) {//left
+                strafeEncoderDifferential(13);//move away from foundation
+            } else {//right
+                strafeEncoderDifferential(14);//move away from foundation
+            }
+            strafeEncoderDifferential(14);//move away from foundation
             robot.stoneArmDown();
             robot.setSlides(0);
 
@@ -908,42 +926,48 @@ public class BLUESkyWithFoundation extends LinearOpMode {
             if(vals[0] == 0){//middle
                 moveEncoderDifferential(100, 5);//move to second stone
             } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(95, 5);
+                moveEncoderDifferential(93 , 5);
             } else {//right
                 moveEncoderDifferential(109, 5);
             }
             robot.stoneArmUp();
-            strafeEncoderDifferential(-11);//move to stone
+            strafeEncoderDifferential(-11);//move to stone 2
             robot.stoneArmDown();
             mySleep(0.3);
             robot.setSlides(-0.6);
             mySleep(0.1);
             robot.setSlides(-0.3);
-            strafeEncoderDifferential(14);//move away from stone
+            strafeEncoderDifferential(14.3);//move away from stone
             if(vals[0] == 0){//middle
-                moveEncoderDifferential(-105, 5);//move to building site
+                moveEncoderDifferential(-113, 5);//move to building site
             } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(-95, 5);
+                moveEncoderDifferential(-103, 5);
             } else {//right
-                moveEncoderDifferential(-109, 5);
+                moveEncoderDifferential(-117, 5);
             }
             robot.useSlideEncoders(true);
-            robot.setSlides(-0.6);
-            rotateEnc(1405, 1.6);
-            robot.hingeWork();
+            robot.setSlides(-1);
+            mySleep(0.35);
+            robot.useSlideEncoders(false);
             robot.setSlides(-0.3);
+            robot.hingeWork();
+            rotateEnc(1405, 1.6);
             robot.setAllGivenPower(0.5);
-            mySleep(1);
+            mySleep(0.85 );
             robot.stopMotors();
             robot.foundationDown();
             robot.stoneArmUp();
             mySleep(0.4);
-            moveEncoderDifferential(-35, 2.2);
+            moveEncoderDifferential(-38, 2.2);
             robot.foundationUp();
             mySleep(0.3);
             robot.useSlideEncoders(false);
-            robot.setSlides(-0.15);
-            strafeEncoderDifferential(45);
+            robot.useEncoders(false);
+            strafeGyro(1, 0.9);
+            robot.setSlides(-0.1);
+            strafeGyro(1, 1);
+
+//            strafeEncoderDifferential(49);
 
 //            robot.setAllGivenPower(-1);
 //            mySleep(0.6);
@@ -960,10 +984,6 @@ public class BLUESkyWithFoundation extends LinearOpMode {
 //            mySleep(0.8);
 //            robot.stopMotors();
             //moveEncoderDifferential(-18, 1.5);
-
-
-
-
 
             //strafeEncoderDifferential(-40);
             //strafeEnc(1, -35);
