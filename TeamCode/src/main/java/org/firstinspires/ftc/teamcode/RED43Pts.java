@@ -59,9 +59,9 @@ import pkg3939.skystoneDetectorClass;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="BLUESkyWithFoundation", group="skystoe")
+@Autonomous(name="RED43Pts", group="skystoe")
 //@Disabled
-public class BLUESkyWithFoundation extends LinearOpMode {
+public class RED43Pts extends LinearOpMode {
 
     /* Declare OpMode members. */
     Robot3939 robot = new Robot3939();   // Use a Pushbot's hardware
@@ -884,11 +884,11 @@ public class BLUESkyWithFoundation extends LinearOpMode {
             strafeEncoderDifferential(11);
 
             if(vals[0] == 0){//middle
-                moveEncoderDifferential(-76, 4);
+                moveEncoderDifferential(76, 4);
             } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(-69, 4);
+                moveEncoderDifferential(83, 4);//farthest
             } else {//right
-                moveEncoderDifferential(-84, 4);
+                moveEncoderDifferential(69, 4);//closest
             }
 //            robot.setSlides(-1);
 //            mySleep(0.15);
@@ -924,11 +924,11 @@ public class BLUESkyWithFoundation extends LinearOpMode {
 
             //running back to grab second stone
             if(vals[0] == 0){//middle
-                moveEncoderDifferential(100, 5);//move to second stone
+                moveEncoderDifferential(-100, 5);//move to second stone
             } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(93 , 5);
+                moveEncoderDifferential(-70 , 5);//get regular stone
             } else {//right
-                moveEncoderDifferential(109, 5);
+                moveEncoderDifferential(-93, 5);//
             }
             robot.stoneArmUp();
             strafeEncoderDifferential(-11);//move to stone 2
@@ -939,15 +939,15 @@ public class BLUESkyWithFoundation extends LinearOpMode {
             robot.setSlides(-0.3);
             strafeEncoderDifferential(14.3);//move away from stone
             if(vals[0] == 0){//middle
-                moveEncoderDifferential(-113, 5);//move to building site
+                moveEncoderDifferential(113, 5);//move to building site
             } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(-103, 5);
+                moveEncoderDifferential(85, 5);
             } else {//right
-                moveEncoderDifferential(-117, 5);
+                moveEncoderDifferential(103, 5);
             }
             robot.useSlideEncoders(true);
             robot.setSlides(-1);
-            mySleep(0.35);
+            mySleep(0.28);
             robot.useSlideEncoders(false);
             robot.setSlides(-0.3);
             robot.hingeWork();
@@ -963,9 +963,9 @@ public class BLUESkyWithFoundation extends LinearOpMode {
             mySleep(0.3);
             robot.useSlideEncoders(false);
             robot.useEncoders(false);
-            strafeGyro(1, 0.9);
+            strafeGyro(-1, 0.9);
             robot.setSlides(-0.1);
-            strafeGyro(1, 1);
+            strafeGyro(-1, 1);
 
 //            strafeEncoderDifferential(49);
 
