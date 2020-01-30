@@ -397,16 +397,11 @@ public class BLUE43Pts extends LinearOpMode {
 
                 robot.setAllGivenPower(power);
 
-                telemetry.addData("Path", "Driving "+distance+" inches");
                 telemetry.addData("target ticks", targetTicks);
                 telemetry.addData("tick Avg", currentTickAvg);
                 telemetry.addData("tickDifference", tickDifference);
                 telemetry.addData("power", power);
-                telemetry.addData("FL ticks", robot.FL.getCurrentPosition());
-                telemetry.addData("FR ticks", robot.FR.getCurrentPosition());
-                telemetry.addData("RR ticks", robot.RR.getCurrentPosition());
-                telemetry.addData("RL ticks", robot.RL.getCurrentPosition());
-                telemetry.addData("timer", (int)runtime.seconds());
+                telemetry.addData("stonearm pos", robot.stoneArm.getPosition());
                 telemetry.update();
             }
             robot.stopMotors();
@@ -881,14 +876,14 @@ public class BLUE43Pts extends LinearOpMode {
             robot.setSlides(-0.6);
             mySleep(0.12);
             robot.setSlides(-0.3);
-            strafeEncoderDifferential(11);
+            strafeEncoderDifferential(12);//move away from stone 1
 
             if(vals[0] == 0){//middle
-                moveEncoderDifferential(-76, 4);
+                moveEncoderDifferential(-76.5, 4);//run to foundation 1
             } else if(vals[1] == 0) {//left
                 moveEncoderDifferential(-69, 4);
             } else {//right
-                moveEncoderDifferential(-83, 4);
+                moveEncoderDifferential(-84.5, 4);
             }
 //            robot.setSlides(-1);
 //            mySleep(0.15);
@@ -912,13 +907,13 @@ public class BLUE43Pts extends LinearOpMode {
             robot.stoneArmUp();
             mySleep(0.3);
             if(vals[0] == 0){//middle
-                strafeEncoderDifferential(15.5);//move away from foundation
+                strafeEncoderDifferential(17.3 );//move away from foundation 1
             } else if(vals[1] == 0) {//left
-                strafeEncoderDifferential(13);//move away from foundation
+                strafeEncoderDifferential(13.5);//move away from foundation 1
             } else {//right
-                strafeEncoderDifferential(14);//move away from foundation
+                strafeEncoderDifferential(15);//move away from foundation 1
             }
-            strafeEncoderDifferential(14);//move away from foundation
+            //strafeEncoderDifferential(14);//move away from foundation
             robot.stoneArmDown();
             robot.setSlides(0);
 
@@ -928,26 +923,38 @@ public class BLUE43Pts extends LinearOpMode {
             } else if(vals[1] == 0) {//left
                 moveEncoderDifferential(93 , 5);
             } else {//right
-                moveEncoderDifferential(70, 5);//get a regular stone
+                moveEncoderDifferential(68.5, 4);//get a regular stone
             }
             robot.stoneArmUp();
-            strafeEncoderDifferential(-11);//move to stone 2
+            if(vals[0] == 0){//middle
+                strafeEncoderDifferential(-10.75);//move to stone 2
+            } else if(vals[1] == 0) {//left
+                strafeEncoderDifferential(-10.5);//move to stone 2
+            } else {//right
+                strafeEncoderDifferential(-10.5);//move to stone 2
+            }
             robot.stoneArmDown();
             mySleep(0.3);
             robot.setSlides(-0.6);
             mySleep(0.1);
             robot.setSlides(-0.3);
-            strafeEncoderDifferential(14.3);//move away from stone
+            if(vals[0] == 0){//middle
+                strafeEncoderDifferential(15.2);//move away from stone
+            } else if(vals[1] == 0) {//left
+                strafeEncoderDifferential(15);//move away from stone
+            } else {//right
+                strafeEncoderDifferential(15);//move away from stone
+            }
             if(vals[0] == 0){//middle
                 moveEncoderDifferential(-113, 5);//move to building site
             } else if(vals[1] == 0) {//left
                 moveEncoderDifferential(-103, 5);
             } else {//right
-                moveEncoderDifferential(-85, 5);
+                moveEncoderDifferential(-84, 5);
             }
             robot.useSlideEncoders(true);
             robot.setSlides(-1);
-            mySleep(0.28);
+            mySleep(0.2);
             robot.useSlideEncoders(false);
             robot.setSlides(-0.3);
             robot.hingeWork();
@@ -957,7 +964,12 @@ public class BLUE43Pts extends LinearOpMode {
             robot.stopMotors();
             robot.foundationDown();
             robot.stoneArmUp();
-            mySleep(0.4);
+            robot.useSlideEncoders(true);
+            robot.setSlides(-1);
+            mySleep(0.15);
+            robot.useSlideEncoders(false);
+            robot.setSlides(-0.3);
+            mySleep(0.3);
             moveEncoderDifferential(-38, 2.2);
             robot.foundationUp();
             mySleep(0.3);
