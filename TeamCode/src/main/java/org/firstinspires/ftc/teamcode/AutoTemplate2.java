@@ -520,6 +520,10 @@ public class AutoTemplate2 extends LinearOpMode {
 
                 telemetry.addData("Path", "Driving "+distance+" inches");
                 telemetry.addData("ti ckDifference", tickDifference);
+                telemetry.addData("FL ticks", robot.FL.getCurrentPosition());
+                telemetry.addData("FR ticks", robot.FR.getCurrentPosition());
+                telemetry.addData("RR ticks", robot.RR.getCurrentPosition());
+                telemetry.addData("RL ticks", robot.RL.getCurrentPosition());
                 telemetry.addData("power", power);
                 telemetry.update();
             }
@@ -599,7 +603,7 @@ public class AutoTemplate2 extends LinearOpMode {
 //            strafeEncoderDifferential(-30);
 //            strafeEncoderDifferential(30);
 
-            strafeEncoderDifferential(-35);
+            strafeEncoderDifferential(-38);
 
 
             telemetry.update();

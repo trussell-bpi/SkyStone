@@ -59,9 +59,9 @@ import pkg3939.skystoneDetectorClass;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="RED43Pts", group="skystoe")
+@Autonomous(name="BLUEFoundationNEUTRALSIDE", group="skystoe")
 //@Disabled
-public class RED43Pts extends LinearOpMode {
+public class BLUEFoundationNEUTRALSIDE extends LinearOpMode {
 
     /* Declare OpMode members. */
     Robot3939 robot = new Robot3939();   // Use a Pushbot's hardware
@@ -400,10 +400,6 @@ public class RED43Pts extends LinearOpMode {
                 telemetry.addData("target ticks", targetTicks);
                 telemetry.addData("tick Avg", currentTickAvg);
                 telemetry.addData("tickDifference", tickDifference);
-                telemetry.addData("FL ticks", robot.FL.getCurrentPosition());
-                telemetry.addData("FR ticks", robot.FR.getCurrentPosition());
-                telemetry.addData("RR ticks", robot.RR.getCurrentPosition());
-                telemetry.addData("RL ticks", robot.RL.getCurrentPosition());
                 telemetry.addData("power", power);
                 telemetry.addData("stonearm pos", robot.stoneArm.getPosition());
                 telemetry.update();
@@ -849,280 +845,27 @@ public class RED43Pts extends LinearOpMode {
 
             robot.foundationUp();
             robot.capstoneUp();
-
-//            moveSlides(1, -120);
-//            robot.hinge.setPosition(0.72);
-//            mySleep(0.4);
-//            robot.stoneArm.setPosition(0.26);
-//            mySleep(0.5);
-//            robot.leftSlides.setPower(0);
-//            robot.rightSlides.setPower(0);
-
-            if(vals[0] == 0){//middle
-//                moveEncoderDifferential(32, 1.8);
-            } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(-7.7, 0.8);
-//                moveEncoderDifferential(32, 1.8);
-            } else {//right
-                moveEncoderDifferential(8.5, 0.8);
-//                moveEncoderDifferential(32, 1.8);
-            }
             robot.useSlideEncoders(true);
             robot.setSlides(-1);//up full speed
             mySleep(0.4);
-            robot.hingeSide();
-            robot.stoneArmUp();
-            robot.useSlideEncoders(false);
-            robot.setSlides(-0.12);//slowly go down
-            strafeEncoderDifferential(-38);//move to stone 1
-            robot.stoneArmDown();
-            mySleep(0.3);
-            robot.useSlideEncoders(false);
-            robot.setSlides(-0.6);
-            mySleep(0.12);
-            robot.setSlides(-0.3);//holds slides
-            strafeEncoderDifferential(13);//move away from stone 1
-
-            if(vals[0] == 0){//middle
-                moveEncoderDifferential(76.3, 4);//run to foundation 1
-            } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(84.5, 4);
-            } else {//right
-                moveEncoderDifferential(68.3, 4);
-            }
-//            robot.setSlides(-1);
-//            mySleep(0.15);
-//            robot.setSlides(-0.3);
-            robot.useSlideEncoders(true);
-            robot.setSlides(-1);
-            mySleep(0.21);
-            robot.useSlideEncoders(false);
-            robot.setSlides(-0.3);
-            if(vals[0] == 0){//middle
-                strafeEncoderDifferential(-12.4);//move to foundation 1
-            } else if(vals[1] == 0) {//left
-                strafeEncoderDifferential(-13.9);//move to foundation 1
-            } else {//right
-                strafeEncoderDifferential(-14.85);//move to foundation 1
-            }
-
-            robot.stoneArmUp();
-            mySleep(0.4);
-            if(vals[0] == 0){//middle
-                strafeEncoderDifferential(15.2);//move away from foundation 1
-            } else if(vals[1] == 0) {//left
-                strafeEncoderDifferential(15.5);//move away from foundation 1
-            } else {//right
-                strafeEncoderDifferential(15.2);//move away from foundation 1
-            }
-            //strafeEncoderDifferential(14);//move away from foundation
-            robot.stoneArmDown();
-            robot.setSlides(0);
-
-            //running back to grab second stone
-            if(vals[0] == 0){//middle
-                moveEncoderDifferential(-100.7 , 5);//run to second stone
-            } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(-68.5, 5);
-            } else {//right
-                moveEncoderDifferential(-93.5, 4);
-            }
-            robot.stoneArmUp();
-            if(vals[0] == 0){//middle
-                strafeEncoderDifferential(-16.5 );//move to stone 2
-            } else if(vals[1] == 0) {//left
-                strafeEncoderDifferential(-11);//move to stone 2
-            } else {//right
-                strafeEncoderDifferential(-13.5);//move to stone 2
-            }
-            robot.stoneArmDown();
-            mySleep(0.3);
-            robot.setSlides(-0.6);
-            mySleep(0.1);
-            robot.setSlides(-0.3);
-            if(vals[0] == 0){//middle
-                strafeEncoderDifferential(16.7);//move away from stone
-            } else if(vals[1] == 0) {//left
-                strafeEncoderDifferential(16);//move away from stone
-            } else {//right
-                strafeEncoderDifferential(15);//move away from stone
-            }
-            if(vals[0] == 0){//middle
-                moveEncoderDifferential(113, 5);//move to building site
-            } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(84, 5);
-            } else {//right
-                moveEncoderDifferential(103, 5);
-            }
-            robot.useSlideEncoders(true);
-            robot.setSlides(-1);
-            mySleep(0.2);
-            robot.useSlideEncoders(false);
-            robot.setSlides(-0.3);
             robot.hingeWork();
-            rotateEnc(1405, 1.6);
-            robot.setAllGivenPower(0.5);
-            mySleep(0.85 );
-            robot.stopMotors();
-            robot.foundationDown();
-            robot.stoneArmUp();
-            robot.useSlideEncoders(true);
-            robot.setSlides(-1);
-            mySleep(0.15);
             robot.useSlideEncoders(false);
-            robot.setSlides(-0.3);
-            mySleep(0.3);
+            robot.setSlides(-0.28);
+
+            strafeEncoderDifferential(-10);
+            moveEncoderDifferential(38, 2.5);
+            robot.foundationDown();
+            mySleep(0.4);
             moveEncoderDifferential(-39.7, 2.2);
             robot.foundationUp();
             mySleep(0.3);
             robot.useSlideEncoders(false);
             robot.useEncoders(false);
-            strafeGyro(-1, 1.1);
+            strafeEncoderDifferential(15);
             robot.setSlides(-0.1);
-            strafeGyro(-1, 0.8);
-
-//            strafeEncoderDifferential(49);
-
-//            robot.setAllGivenPower(-1);
-//            mySleep(0.6);
-//            robot.RL.setPower(0.2);
-//            robot.FL.setPower(0.2);
-//            mySleep(1);
-//            robot.setAllGivenPower(-1);
-//            mySleep((0.3));
-            //robot.setAllGivenPower(0.4);
-            //rotateEnc(1405, 1.6);
-//            robot.foundationUp();
-//            mySleep(0.3);
-//            robot.setAllGivenPower(-1);
-//            mySleep(0.8);
-//            robot.stopMotors();
-            //moveEncoderDifferential(-18, 1.5);
-
-            //strafeEncoderDifferential(-40);
-            //strafeEnc(1, -35);
-//            //-0.3 = hold
-//            //-0.4 = slowly up without stone
-//            //-0.45 = slowly up WITH stone
-//
-            // mySleep(0.1);
-//            robot.stoneArmDown();
-//            mySleep(0.3);
-//            robot.setSlides(-0.5);
-//            mySleep(0.08);
-//            robot.setSlides(-0.3);
-//            moveEncoderDifferential(-8, 1);
-//
-//
-//            strafeEnc(-1, -110);
-////            strafeEncoderDifferential(-100);
-//            robot.setSlides(-1);
-//            robot.setAllGivenPower(0.6);
-//            mySleep(0.15);
-//            robot.setSlides(-0.3);
-//            mySleep(0.5);
-//            robot.stopMotors();
-//            robot.setSlides(-0.1);//drop slides
-//            mySleep(0.25);
-//            robot.stoneArmUp();//release stone
-//            robot.setSlides(-0.5);
-//            mySleep(0.15);
-//            robot.setSlides(-0.3);
-//            moveEncoderDifferential(-15, 2);
-//            robot.stoneArmDown();
-//            robot.dropSlides();
-//            strafeEnc(1, 130);
-
-            //foundation
-//            robot.foundationDown();//lower foundation hooks
-//            mySleep(0.3);
-//            moveEncoderDifferential(-28, 1.4);//drag back a little
-//            robot.stopMotors();//
-//            robot.FL.setPower(1);//push right side of robot forward
-//            robot.RL.setPower(1);
-//            mySleep(1);
-//            robot.stopMotors();
-//            robot.setAllGivenPower(-1);
-//            mySleep(0.5);
-//            robot.FL.setPower(0);//stop right side of robot
-//            robot.RL.setPower(0);
-//            mySleep(1);
-//            robot.stopMotors();
-//            strafeGyro(1, 1);//strafe right to align with middle of foundation
-//            moveEncoderDifferential(16, 1.2);//push forward to align with wall
-//            robot.foundationUp();//release foundation
-//            mySleep(0.3);
-//            moveEncoderDifferential(-27, 1.4) ;//move straight back towards parking spot
-//            robot.leftSlides.setPower(0);
-//            robot.rightSlides.setPower(0);//release slides because going under bridge
-//            moveEncoderDifferential(-20, 1.3);//move under bridge.
-
-
-//            rotateEnc(1300, 1.69);//turn left 90 degrees
-//
-//            if(vals[0] == 0){//middle
-//                moveEncoderDifferential(87, 3.3);//run to foundation side
-//            } else if(vals[1] == 0) {//left
-//                moveEncoderDifferential(80, 3.1);//run to foundation side
-//            } else {//right
-//                moveEncoderDifferential(95, 3.5);//run to foundation side
-//            }
-//            robot.leftSlides.setPower(-1);//slides going up
-//            robot.rightSlides.setPower(-1);
-//            mySleep(0.15);
-//            robot.leftSlides.setPower(-0.3);//slides hold
-//            robot.rightSlides.setPower(-0.3);
-//            rotateEnc(-1300, 1.69);//turn left 90 degrees
-//            moveEncoderDifferential(9, 1.2);//push against foundation
-//            robot.leftSlides.setPower(-0.1);
-//            robot.rightSlides.setPower(-0.1);//drop slides
-//            mySleep(0.25);
-//            robot.stoneArm.setPosition(0.33);//release stone
-//            robot.leftSlides.setPower(-0.5);
-//            robot.rightSlides.setPower(-0.5);
-//            mySleep(0.15);
-//            robot.leftSlides.setPower(-0.3);
-//            robot.rightSlides.setPower(-0.3);
-//
-//            //foundation
-//            robot.foundationDown();//lower foundation hooks
-//            mySleep(0.3);
-//            moveEncoderDifferential(-28, 1.4);//drag back a little
-//            robot.stopMotors();//
-//            robot.FL.setPower(1);//push right side of robot forward
-//            robot.RL.setPower(1);
-//            mySleep(1);
-//            robot.stopMotors();
-//            robot.setAllGivenPower(-1);
-//            mySleep(0.5);
-//            robot.FL.setPower(0);//stop right side of robot
-//            robot.RL.setPower(0);
-//            mySleep(1);
-//            robot.stopMotors();
-//            strafeGyro(1, 1);//strafe right to align with middle of foundation
-//            moveEncoderDifferential(16, 1.2);//push forward to align with wall
-//            robot.foundationUp();//release foundation
-//            mySleep(0.3);
-//            moveEncoderDifferential(-27, 1.4) ;//move straight back towards parking spot
-//            robot.leftSlides.setPower(0);
-//            robot.rightSlides.setPower(0);//release slides because going under bridge
-//            moveEncoderDifferential(-20, 1.3);//move under bridge.
-
-            //old foundation
-//            robot.FL.setPower(-1);//pull right side of the robot back
-//            robot.RL.setPower(-1);
-//            mySleep(1.4);
-//            robot.stopMotors();
-//            strafeGyro(-1, 0.7 );//strafe left to align with middle of foundation
-//            moveEncoderDifferential(15, 1);//push forward to align with wall
-//            robot.foundationUp();//release foundation
-//            mySleep(0.3);
-//            moveEncoderDifferential(-27, 1.5);//move straight back towards parking spot
-//            robot.leftSlides.setPower(0);
-//            robot.rightSlides.setPower(0);//release slides because going under bridge
-//            moveEncoderDifferential(-20, 1.3);//move under bridge.
-
-
+            moveEncoderDifferential(20, 1.8);
+            strafeEncoderDifferential(-10);
+            strafeEncoderDifferential(25);
         }
     }
 }

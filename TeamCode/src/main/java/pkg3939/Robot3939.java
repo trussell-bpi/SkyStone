@@ -336,11 +336,11 @@ public class Robot3939 {
     }
 
     public void capstoneDown() {
-        capstone.setPosition(0.5);
+        capstone.setPosition(0);
     }
 
     public void capstoneUp() {
-        capstone.setPosition(0);
+        capstone.setPosition(0.5);
     }
 
     public void hingeWork() {
@@ -366,25 +366,22 @@ public class Robot3939 {
             if(hingePos > 2)
                 hingePos = 0;
 
-//            hingeTurn = !hingeTurn;
+            switch(hingePos) {
+                case 0:
+                    hingeHome();//home
+                    break;
+                case 1:
+                    hingeWork();//work
+                    break;
+                case 2:
+                    hingeSide();//side
+                    break;
+            }
+
         } else if(!b2Pressed)
             b2Held = false;
 
-        switch(hingePos) {
-            case 0:
-                hingeWork();//home
-                break;
-            case 1:
-                hingeSide();//side
-                break;
-            case 2:
-                hingeHome();//work
-                break;
-        }
-//        if(hingeTurn)//work mode
-//            hinge.setPosition(0.72);
-//        else//home mode
-//            hinge.setPosition(0.04);
+
     }
 
     public void stoneArmDown() {

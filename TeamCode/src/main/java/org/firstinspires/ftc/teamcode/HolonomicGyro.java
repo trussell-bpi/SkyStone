@@ -106,8 +106,14 @@ public class HolonomicGyro extends LinearOpMode {
 
                 if (gamepad2.right_bumper && !robot.slidesDown())
                     moveSlides(0.2, 20);
-                else if (gamepad2.left_bumper)
-                    moveSlides(-1, -70);
+                else if (gamepad2.left_bumper){
+                    robot.useSlideEncoders(true);
+                    robot.setSlides(-1);
+                    mySleep(0.2);
+                    robot.useSlideEncoders(false);
+                    robot.setSlides(-0.3);
+                }
+                    //moveSlides(-1, -70);
                 else if (gamepad2.dpad_up && robot.slidesDown())
                     moveSlides(-1, -220);
                 else if (gamepad2.dpad_down) {

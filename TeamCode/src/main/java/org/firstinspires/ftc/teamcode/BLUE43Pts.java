@@ -371,6 +371,7 @@ public class BLUE43Pts extends LinearOpMode {
 
             while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy()) {
                 //wait till motor finishes
+                robot.hinge.setPosition(robot.hinge.getPosition());
 
                 if(runtime.seconds() > failsafe)//fail safe, in case of infinite loop
                     break;
@@ -844,6 +845,7 @@ public class BLUE43Pts extends LinearOpMode {
             vals = detector.getVals();
 
             robot.foundationUp();
+            robot.capstoneUp();
 
 //            moveSlides(1, -120);
 //            robot.hinge.setPosition(0.72);
@@ -856,32 +858,33 @@ public class BLUE43Pts extends LinearOpMode {
             if(vals[0] == 0){//middle
 //                moveEncoderDifferential(32, 1.8);
             } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(-8.5, 0.8);
+                moveEncoderDifferential(-7.7, 0.8);
 //                moveEncoderDifferential(32, 1.8);
             } else {//right
                 moveEncoderDifferential(8.5, 0.8);
 //                moveEncoderDifferential(32, 1.8);
             }
             robot.useSlideEncoders(true);
-            robot.setSlides(-1);
+            robot.setSlides(-1);//up full speed
             mySleep(0.4);
             robot.hingeSide();
             robot.stoneArmUp();
             robot.useSlideEncoders(false);
-            robot.setSlides(-0.15);
+            robot.setSlides(-0.15);//slowly go down
             strafeEncoderDifferential(-38);//move to stone 1
             robot.stoneArmDown();
             mySleep(0.3);
             robot.useSlideEncoders(false);
             robot.setSlides(-0.6);
             mySleep(0.12);
-            robot.setSlides(-0.3);
+            robot.setSlides(-0.3);//holds slides
             strafeEncoderDifferential(12);//move away from stone 1
+            robot.capstoneUp();
 
             if(vals[0] == 0){//middle
                 moveEncoderDifferential(-76.5, 4);//run to foundation 1
             } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(-69, 4);
+                moveEncoderDifferential(-68.3, 4);
             } else {//right
                 moveEncoderDifferential(-84.5, 4);
             }
@@ -890,28 +893,25 @@ public class BLUE43Pts extends LinearOpMode {
 //            robot.setSlides(-0.3);
             robot.useSlideEncoders(true);
             robot.setSlides(-1);
-            mySleep(0.19);
+            mySleep(0.21);
             robot.useSlideEncoders(false);
             robot.setSlides(-0.3);
             if(vals[0] == 0){//middle
                 strafeEncoderDifferential(-14.8);//move to foundation 1
-
             } else if(vals[1] == 0) {//left
-                strafeEncoderDifferential(-14.3);//move to foundation 1
-
+                strafeEncoderDifferential(-14.15);//move to foundation 1
             } else {//right
-                strafeEncoderDifferential(-14.6);//move to foundation 1
-
+                strafeEncoderDifferential(-14.85);//move to foundation 1
             }
 
             robot.stoneArmUp();
-            mySleep(0.3);
+            mySleep(0.4);
             if(vals[0] == 0){//middle
                 strafeEncoderDifferential(17.3 );//move away from foundation 1
             } else if(vals[1] == 0) {//left
-                strafeEncoderDifferential(13.5);//move away from foundation 1
+                strafeEncoderDifferential(15.5);//move away from foundation 1
             } else {//right
-                strafeEncoderDifferential(15);//move away from foundation 1
+                strafeEncoderDifferential(15.2 );//move away from foundation 1
             }
             //strafeEncoderDifferential(14);//move away from foundation
             robot.stoneArmDown();
@@ -919,17 +919,17 @@ public class BLUE43Pts extends LinearOpMode {
 
             //running back to grab second stone
             if(vals[0] == 0){//middle
-                moveEncoderDifferential(100, 5);//move to second stone
+                moveEncoderDifferential(100, 5);//run to second stone
             } else if(vals[1] == 0) {//left
-                moveEncoderDifferential(93 , 5);
+                moveEncoderDifferential(91, 5);
             } else {//right
-                moveEncoderDifferential(68.5, 4);//get a regular stone
+                moveEncoderDifferential(68.5, 4);//run to get a regular stone
             }
             robot.stoneArmUp();
             if(vals[0] == 0){//middle
-                strafeEncoderDifferential(-10.75);//move to stone 2
+                strafeEncoderDifferential(-13.5);//move to stone 2
             } else if(vals[1] == 0) {//left
-                strafeEncoderDifferential(-10.5);//move to stone 2
+                strafeEncoderDifferential(-11);//move to stone 2
             } else {//right
                 strafeEncoderDifferential(-10.5);//move to stone 2
             }
@@ -939,9 +939,9 @@ public class BLUE43Pts extends LinearOpMode {
             mySleep(0.1);
             robot.setSlides(-0.3);
             if(vals[0] == 0){//middle
-                strafeEncoderDifferential(15.2);//move away from stone
+                strafeEncoderDifferential(16.2);//move away from stone
             } else if(vals[1] == 0) {//left
-                strafeEncoderDifferential(15);//move away from stone
+                strafeEncoderDifferential(16);//move away from stone
             } else {//right
                 strafeEncoderDifferential(15);//move away from stone
             }
@@ -975,7 +975,7 @@ public class BLUE43Pts extends LinearOpMode {
             mySleep(0.3);
             robot.useSlideEncoders(false);
             robot.useEncoders(false);
-            strafeGyro(1, 0.9);
+            strafeGyro(1, 1.1);
             robot.setSlides(-0.1);
             strafeGyro(1, 1);
 
