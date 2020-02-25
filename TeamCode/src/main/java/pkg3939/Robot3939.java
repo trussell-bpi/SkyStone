@@ -2,6 +2,7 @@ package pkg3939;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -17,7 +18,8 @@ import static java.lang.Math.*;
 public class Robot3939 {
 
     public DcMotor RL, RR, FL, FR;//drive motors
-    public DcMotor leftSlides, rightSlides;//linear slide motors
+    //public DcMotor slides;//linear slide motors
+    public DcMotorEx slides;//linear slide motors
     public Servo servoRight, servoLeft;//autonomous claw servos
     public Servo bar;//foundation mover servo
     public Servo stoneArm;
@@ -31,6 +33,7 @@ public class Robot3939 {
     public double FLpower, FRpower, RLpower, RRpower;//power of the motors
     public double speed = 10.0;
     public boolean capstoneUp = true;
+    public int slidePosition = 0;
 
     public static final double HOLD_POWER = -0.3;
     public static final double minSpeed = 0.10;
@@ -52,35 +55,36 @@ public class Robot3939 {
     }
 
     public void initLinearSlides(HardwareMap hwmap) {
-        leftSlides = hwmap.dcMotor.get("leftSlides");
-        rightSlides = hwmap.dcMotor.get("rightSlides");
+        //slides = hwmap.dcMotor.get("slides");
+        slides = (DcMotorEx)hwmap.get(DcMotor.class, "slides");
 
-        leftSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slides.setDirection(DcMotorSimple.Direction.FORWARD);
+        //rightSlides.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        leftSlides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightSlides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //rightSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //rightSlides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        leftSlides.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightSlides.setDirection(DcMotorSimple.Direction.FORWARD);
+        slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
     }
 
     public void dropSlides() {
-        leftSlides.setPower(0);
-        rightSlides.setPower(0);
+        slides.setPower(0);
+        //rightSlides.setPower(0);
     }
 
     public void holdSlides() {
-        leftSlides.setPower(HOLD_POWER);
-        rightSlides.setPower(HOLD_POWER);
+        slides.setPower(HOLD_POWER);
+        //rightSlides.setPower(HOLD_POWER);
     }
 
     public void setSlides(double power) {
-        leftSlides.setPower(power);
-        rightSlides.setPower(power);
+        slides.setPower(power);
+        //rightSlides.setPower(power);
     }
 
     public void setFront(HardwareMap hwmap) {
@@ -91,8 +95,8 @@ public class Robot3939 {
     }
 
     public void initServos(HardwareMap hwmap) {
-        servoRight = hwmap.servo.get("servoRight");//left foundation
-        servoLeft = hwmap.servo.get("servoLeft");//right foundation
+        servoRight = hwmap.servo.get("rightServo");//left foundation
+        servoLeft = hwmap.servo.get("leftServo");//right foundation
         stoneArm = hwmap.servo.get("stoneArm");
         hinge = hwmap.servo.get("hinge");
         capstone = hwmap.servo.get("capstone");
@@ -129,11 +133,11 @@ public class Robot3939 {
 
     public void useSlideEncoders(boolean status) {
         if(status) {
-            leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            //rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         } else {
-            leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            //rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
 
@@ -299,30 +303,30 @@ public class Robot3939 {
     boolean stoneArmGrab = false;
 
     public boolean slidesDown() {
-        if(leftSlides.getPower() == 0 && rightSlides.getPower() == 0)
+        if(slides.getCurrentPosition() < 20)
             return true;
         return false;
     }
 
     public void setSlidesPower(double power) {
-        leftSlides.setPower(power);
-        rightSlides.setPower(power);
+        slides.setPower(power);
+        //rightSlides.setPower(power);
     }
 
     public void leftServoDown() {
-        servoLeft.setPosition(0.29);
+        servoLeft.setPosition(0.35);
     }
 
     public void leftServoUp() {
-        servoLeft.setPosition(0.7);
+        servoLeft.setPosition(1);
     }
 
     public void rightServoDown() {
-        servoRight.setPosition(1);
+        servoRight.setPosition(0.45);
     }
 
     public void rightServoUp() {
-        servoRight.setPosition(0.5);
+        servoRight.setPosition(0);
     }
 
     public void foundationDown() {
@@ -363,7 +367,7 @@ public class Robot3939 {
 
             //code
             hingePos++;
-            if(hingePos > 2)
+            if(hingePos > 1)
                 hingePos = 0;
 
             switch(hingePos) {
@@ -373,9 +377,9 @@ public class Robot3939 {
                 case 1:
                     hingeWork();//work
                     break;
-                case 2:
-                    hingeSide();//side
-                    break;
+//                case 2:
+//                    hingeSide();//side
+//                    break;
             }
 
         } else if(!b2Pressed)

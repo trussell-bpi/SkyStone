@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import pkg3939.Robot3939;
@@ -22,6 +23,11 @@ public class HolonomicGyro extends LinearOpMode {
     //Declaration of the motors and servos goes here
     Robot3939 robot = new Robot3939();
 
+    public static final double NEW_P = 10.0;//2.5
+    public static final double NEW_I = 0.0;//0.1
+    public static final double NEW_D = 0.0;//0.2
+    public static final double NEW_F = 0.0;//0.0
+
     public void mySleep(double time) {//seconds
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < time)) {
@@ -29,46 +35,32 @@ public class HolonomicGyro extends LinearOpMode {
         }
     }
 
-     public void moveSlides(double power, int constant) {
+     public void setSlides(double power, int constant) {
         if (opModeIsActive()) {
-            robot.leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.slides.setTargetPosition(robot.slides.getCurrentPosition() + constant);
+            //robot.rightSlides.setTargetPosition(robot.rightSlides.getCurrentPosition() + constant);
 
-            robot.leftSlides.setTargetPosition(robot.leftSlides.getCurrentPosition() + constant);
-            robot.rightSlides.setTargetPosition(robot.rightSlides.getCurrentPosition() + constant);
+            //robot.slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            //robot.rightSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            robot.leftSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.rightSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.slides.setPower(power);
+            //robot.rightSlides.setPower(power);
 
-            robot.leftSlides.setPower(power);
-            robot.rightSlides.setPower(power);
+            //robot.slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-            runtime.reset();
-
-            while (robot.leftSlides.isBusy() || robot.rightSlides.isBusy()) {
+            while (robot.slides.isBusy()) {
                 //wait till motor finishes working
-                robot.drive(gamepad1.left_stick_x,
-                        gamepad1.left_stick_y,
-                        gamepad1.right_stick_x);
-                telemetry.addLine("Slides Extending");
-                telemetry.update();
-                if (runtime.seconds() > 1.2)
-                    break;
+//                robot.drive(gamepad1.left_stick_x,
+//                        gamepad1.left_stick_y,
+//                        gamepad1.right_stick_x);
+//                telemetry.addLine("Slides Extending");
+//                telemetry.update();
             }
-            telemetry.addLine("Extended");
-            telemetry.update();
 
-            robot.leftSlides.setPower(0);
-            robot.rightSlides.setPower(0);
-
-            robot.leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-            robot.leftSlides.setPower(-0.4);
-            robot.rightSlides.setPower(-0.4);
-            //
-//            robot.leftSlides.setPower(0);
-//            robot.rightSlides.setPower(0);
+//            //robot.rightSlides.setPower(-0.4);
+//            //
+////            robot.slides.setPower(0);
+////            robot.rightSlides.setPower(0);
         }
     }
 
@@ -82,6 +74,12 @@ public class HolonomicGyro extends LinearOpMode {
         robot.useEncoders(false);//don't need encoders for teleop
         robot.initLinearSlides(hardwareMap);
 
+
+        // re-read coefficients and verify change.
+        PIDFCoefficients pidNew = new PIDFCoefficients(NEW_P, NEW_I, NEW_D, NEW_F);
+        //robot.slides.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidNew);
+
+        PIDFCoefficients pidModified = robot.slides.getPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION);
 
 
         boolean yHeld = false;
@@ -105,31 +103,32 @@ public class HolonomicGyro extends LinearOpMode {
                 robot.setStoneArm(gamepad2.a);
 
                 if (gamepad2.right_bumper && !robot.slidesDown())
-                    moveSlides(0.2, 20);
+                    setSlides(1, -100);
                 else if (gamepad2.left_bumper){
-                    robot.useSlideEncoders(true);
-                    robot.setSlides(-1);
-                    mySleep(0.2);
-                    robot.useSlideEncoders(false);
-                    robot.setSlides(-0.3);
+                    setSlides(1, 100);
+//                    robot.useSlideEncoders(true);
+//                    robot.setSlides(-1);
+//                    mySleep(0.2);
+//                    robot.useSlideEncoders(false);
+//                    robot.setSlides(-0.3);
                 }
-                    //moveSlides(-1, -70);
+                    //setSlides(-1, -70);
                 else if (gamepad2.dpad_up && robot.slidesDown())
-                    moveSlides(-1, -220);
+                    setSlides(-1, -220);
                 else if (gamepad2.dpad_down) {
-                    robot.leftSlides.setPower(0);
-                    robot.rightSlides.setPower(0);
+                    robot.slides.setPower(0);
+                    //robot.rightSlides.setPower(0);
                 }
 
                 //elevate slightly to move stone under bridge
                 if (!y2Held && gamepad2.y) {
                     y2Held = true;
                     robot.useSlideEncoders(false);
-                    robot.leftSlides.setPower(-0.5);
-                    robot.rightSlides.setPower(-0.5);
+                    robot.slides.setPower(-0.5);
+                    //robot.rightSlides.setPower(-0.5);
                     mySleep(0.1);
-                    robot.leftSlides.setPower(-0.3);
-                    robot.rightSlides.setPower(-0.3);
+                    robot.slides.setPower(-0.3);
+                    //robot.rightSlides.setPower(-0.3);
                 } else if (!gamepad2.y) {
                     y2Held = false;
                 }
@@ -175,13 +174,15 @@ public class HolonomicGyro extends LinearOpMode {
                         robot.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
                 }
 
-                telemetry.addData("Drive", "Holonomic");
                 //telemetry.addData("Global Heading", robot.getAngle());
                 telemetry.addData("LX", gamepad1.left_stick_x);
                 telemetry.addData("LY", gamepad1.left_stick_y);
                 telemetry.addData("RX", gamepad1.right_stick_x);
 
-                telemetry.addData("speed", robot.speed);
+                telemetry.addData("slide position", robot.slides.getCurrentPosition());
+                telemetry.addData("P,I,D (modified)", "%.04f, %.04f, %.04f",
+                    pidModified.p, pidModified.i, pidModified.d);
+
                 telemetry.addData("capstone", robot.capstone.getPosition());
                 telemetry.addData("left servo", robot.servoLeft.getPosition());
                 telemetry.addData("right servo", robot.servoRight.getPosition());

@@ -381,12 +381,12 @@
 //
 //            //all run to position
 //            robot.RUN_TO_POSITION();
-//            robot.leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            robot.slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //            robot.rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //
 //
 //            robot.setAllGivenPower(power);//sets all motors to the given power
-//            robot.leftSlides.setPower(-1);
+//            robot.slides.setPower(-1);
 //            robot.rightSlides.setPower(-1);
 //
 //
@@ -394,15 +394,15 @@
 //            boolean hold = true;
 //            runtime.reset();
 //
-//            while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy() || robot.leftSlides.isBusy() || robot.rightSlides.isBusy()) {
+//            while(robot.RL.isBusy() || robot.RR.isBusy() || robot.FL.isBusy() || robot.FR.isBusy() || robot.slides.isBusy() || robot.rightSlides.isBusy()) {
 //                //wait till motor finishes
 //                if(runtime.seconds() > 1.2 && hold) {
-//                    robot.leftSlides.setPower(0);
+//                    robot.slides.setPower(0);
 //                    robot.rightSlides.setPower(0);
 //
 //                    robot.hinge.setPosition(0.04);
 //
-//                    robot.leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//                    robot.slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //                    robot.rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //
 //                    hold = false;
@@ -443,13 +443,13 @@
 //                telemetry.update();
 //            }
 //
-//            robot.leftSlides.setPower(0);
+//            robot.slides.setPower(0);
 //            robot.rightSlides.setPower(0);
 //
-//            robot.leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            robot.slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //            robot.rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //
-//            robot.leftSlides.setPower(-0.3);
+//            robot.slides.setPower(-0.3);
 //            robot.rightSlides.setPower(-0.3);
 //
 //            robot.stopMotors();
@@ -682,23 +682,23 @@
 //        }
 //    }
 //
-//    public void moveSlides(double power, int constant) {
+//    public void setSlides(double power, int constant) {
 //        if (opModeIsActive()) {
-//            robot.leftSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//            robot.slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //            robot.rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //
-//            robot.leftSlides.setTargetPosition(robot.leftSlides.getCurrentPosition() + constant);
+//            robot.slides.setTargetPosition(robot.slides.getCurrentPosition() + constant);
 //            robot.rightSlides.setTargetPosition(robot.rightSlides.getCurrentPosition() + constant);
 //
-//            robot.leftSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            robot.slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //            robot.rightSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //
-//            robot.leftSlides.setPower(power);
+//            robot.slides.setPower(power);
 //            robot.rightSlides.setPower(power);
 //
 //            runtime.reset();
 //
-//            while (robot.leftSlides.isBusy() || robot.rightSlides.isBusy()) {
+//            while (robot.slides.isBusy() || robot.rightSlides.isBusy()) {
 //                //wait till motor finishes working
 //                robot.drive(gamepad1.left_stick_x,
 //                        gamepad1.left_stick_y,
@@ -711,16 +711,16 @@
 //            telemetry.addLine("Extended");
 //            telemetry.update();
 //
-//            robot.leftSlides.setPower(0);
+//            robot.slides.setPower(0);
 //            robot.rightSlides.setPower(0);
 //
-//            robot.leftSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            robot.slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //            robot.rightSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //
-//            robot.leftSlides.setPower(-0.25);
+//            robot.slides.setPower(-0.25);
 //            robot.rightSlides.setPower(-0.25);
 //            //
-////            robot.leftSlides.setPower(0);
+////            robot.slides.setPower(0);
 ////            robot.rightSlides.setPower(0);
 //        }
 //    }
@@ -742,7 +742,7 @@
 //                mySleep(0.4);
 //                robot.stoneArm.setPosition(0.26);
 //                mySleep(0.5);
-//                robot.leftSlides.setPower(0);
+//                robot.slides.setPower(0);
 //                robot.rightSlides.setPower(0);
 //            }
 //            robot.FL.setPower(power + correction);//if so, push him/her back to defend your seat(correction), but the train keeps going(power)
