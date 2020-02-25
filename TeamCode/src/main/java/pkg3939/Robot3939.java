@@ -21,7 +21,6 @@ public class Robot3939 {
     //public DcMotor slides;//linear slide motors
     public DcMotorEx slides;//linear slide motors
     public Servo servoRight, servoLeft;//autonomous claw servos
-    public Servo bar;//foundation mover servo
     public Servo stoneArm;
     public Servo hinge;
     public Servo capstone;
@@ -56,18 +55,17 @@ public class Robot3939 {
 
     public void initLinearSlides(HardwareMap hwmap) {
         //slides = hwmap.dcMotor.get("slides");
-        slides = (DcMotorEx)hwmap.get(DcMotor.class, "slides");
+        slides = (DcMotorEx)hwmap.dcMotor.get("slides");
 
         slides.setDirection(DcMotorSimple.Direction.FORWARD);
-        //rightSlides.setDirection(DcMotorSimple.Direction.FORWARD);
 
         slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //rightSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //rightSlides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //slides.setTargetPosition(0);
+
+        //slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         //rightSlides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
