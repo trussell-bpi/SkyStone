@@ -3,8 +3,10 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import pkg3939.Robot3939;
 
@@ -23,14 +25,22 @@ public class HolonomicGyro extends LinearOpMode {
     //Declaration of the motors and servos goes here
     Robot3939 robot = new Robot3939();
 
-    public static final double NEW_P = 9.0;//2.5
-    public static final double NEW_I = 0.0;//0.1
-    public static final double NEW_D = 0.0;//0.2
-    public static final double NEW_F = 0.0;//0.0
+    public static final int SWING_HEIGHT = 1000;//height at which we can swing the hinge
+    public static final int MAX_HEIGHT = 2205;//max ticks
+    public static final int MAX_STACK_COUNT = 9;//number of stones max
+    public static final int MINIMUM_HEIGHT = 0;//ticks
 
-    public static final int SWING_HEIGHT = 100;
-    public static final int STAGE_INCREMENT_VALUE = 100;
-    public static final int MAX_HEIGHT = 2210;
+    public static final int STAGE1 = 0;
+    public static final int STAGE2 = 400;
+    public static final int STAGE3 = 630;
+    public static final int STAGE4 = 870;
+    public static final int STAGE5 = 1110;
+    public static final int STAGE6 = 1370;
+    public static final int STAGE7 = 1600;
+    public static final int STAGE8 = 1840;
+    public static final int STAGE9 = 2090;
+
+    public static int STAGE = 0;
 
     public void mySleep(double time) {//seconds
         runtime.reset();
@@ -41,10 +51,15 @@ public class HolonomicGyro extends LinearOpMode {
 
      public void setSlides(double power, int constant) {
         if (opModeIsActive()) {
-            robot.slides.setTargetPosition(robot.slides.getCurrentPosition() + constant);
+            int tickDifference = Math.abs(robot.slides.getCurrentPosition() - constant);
+            robot.slides.setTargetPosition(constant);
 
             robot.slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.slides.setPower(power);
+            if(constant == MINIMUM_HEIGHT && tickDifference < 60) {
+                robot.slides.setPower(0.3);
+            } else
+                robot.slides.setPower(power);
+
 
             while (robot.slides.isBusy()) {
                 //wait till motor finishes working
@@ -54,6 +69,41 @@ public class HolonomicGyro extends LinearOpMode {
                 telemetry.addLine("Slides Extending");
                 telemetry.update();
             }
+        }
+     }
+
+    public void runToStage(int targetStage) {
+        switch(targetStage) {
+            case 0:
+                setSlides(1, MINIMUM_HEIGHT);
+                break;
+            case 1:
+                setSlides(1, STAGE1);
+                break;
+            case 2:
+                setSlides(1, STAGE2);
+                break;
+            case 3:
+                setSlides(1, STAGE3);
+                break;
+            case 4:
+                setSlides(1, STAGE4);
+                break;
+            case 5:
+                setSlides(1, STAGE5);
+                break;
+            case 6:
+                setSlides(1, STAGE6);
+                break;
+            case 7:
+                setSlides(1, STAGE7);
+                break;
+            case 8:
+                setSlides(1, STAGE8);
+                break;
+            case 9:
+                setSlides(1, STAGE9);
+                break;
         }
     }
 
@@ -69,15 +119,23 @@ public class HolonomicGyro extends LinearOpMode {
 
         boolean yHeld = false;
         boolean y2Held = false;
+        boolean x2Held = false;
+        boolean RB2Held = false;
+        boolean LB2Held = false;
         boolean useNormal = true;
         boolean initIMU = true;
         boolean xHeld = false;
         boolean capstoneUp = false;
 
 
-        //robot.slides.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(10, 0.05, 0, 0));
+        waitForStart();
 
-        robot.slides.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, new PIDFCoefficients(10, 0.05, 0, 0));
+        //robot.slides.setVelocityPIDFCoefficients(10, 0, 0, 0);
+
+        //robot.slides.setPositionPIDFCoefficients(10);
+
+
+        //int motorIndex = ((DcMotorEx)lift);
 
         PIDFCoefficients pidRUNUSINGENCODERS = robot.slides.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -97,30 +155,13 @@ public class HolonomicGyro extends LinearOpMode {
 
                 robot.setStoneArm(gamepad2.a);
 
-                if (gamepad2.right_bumper && !robot.slidesDown())
-                    setSlides(1, -STAGE_INCREMENT_VALUE);
-                else if (gamepad2.left_bumper){
-                    setSlides(1, STAGE_INCREMENT_VALUE);
-                }
                     //setSlides(-1, -70);
-                else if (gamepad2.dpad_up && robot.slidesDown())
+                if (gamepad2.dpad_up && robot.slidesDown())
                     setSlides(1, MAX_HEIGHT);
                 else if (gamepad2.dpad_down) {
                     setSlides(1,0);
                 }
 
-                //elevate slightly to move stone under bridge
-                if (!y2Held && gamepad2.y) {
-                    y2Held = true;
-                    robot.useSlideEncoders(false);
-                    robot.slides.setPower(-0.5);
-                    //robot.rightSlides.setPower(-0.5);
-                    mySleep(0.1);
-                    robot.slides.setPower(-0.3);
-                    //robot.rightSlides.setPower(-0.3);
-                } else if (!gamepad2.y) {
-                    y2Held = false;
-                }
 
                 if(!xHeld && gamepad1.x) {
                     xHeld = true;
@@ -166,6 +207,55 @@ public class HolonomicGyro extends LinearOpMode {
                     }
                 }
 
+                //increment stage count
+                if (!RB2Held && gamepad2.right_bumper) {
+                    RB2Held = true;
+                    STAGE++;
+
+                } else if (!gamepad2.right_bumper) {
+                    RB2Held = false;
+                }
+
+                //decrement stage count
+                if (!LB2Held && gamepad2.left_bumper) {
+                    LB2Held = true;
+                    STAGE--;
+
+                } else if (!gamepad2.left_bumper) {
+                    LB2Held = false;
+                }
+
+                STAGE = Range.clip(STAGE, 0, MAX_STACK_COUNT);
+
+
+                //go to position(STAGE)
+                if(!x2Held && gamepad2.x) {
+                    x2Held = true;
+                    runToStage(STAGE);
+                } if(!gamepad2.x) {
+                    x2Held = false;
+                }
+
+                if (!y2Held && gamepad2.y) {
+                    y2Held = true;
+                    STAGE = 0;
+                    setSlides(1, MINIMUM_HEIGHT);
+                } else if (!gamepad2.y) {
+                    y2Held = false;
+                }
+
+                //manually fine tune slide height
+                if(gamepad2.right_trigger > 0.1) {
+                    if(MAX_HEIGHT - robot.slides.getCurrentPosition() > gamepad2.right_trigger * 30)
+                        setSlides(1, (int)(robot.slides.getCurrentPosition() + gamepad2.right_trigger * 100));
+                } else if(gamepad2.left_trigger > 0.1 && (robot.slides.getCurrentPosition() > 10)) {
+                    if(robot.slides.getCurrentPosition() - MINIMUM_HEIGHT > gamepad2.left_trigger * 50)
+                        setSlides(0.5, (int)(robot.slides.getCurrentPosition() - gamepad2.left_trigger * 100));
+                }
+
+
+
+
                 //telemetry.addData("Global Heading", robot.getAngle());
                 telemetry.addData("LX", gamepad1.left_stick_x);
                 telemetry.addData("LY", gamepad1.left_stick_y);
@@ -178,6 +268,7 @@ public class HolonomicGyro extends LinearOpMode {
                 telemetry.addData("P,I,D (modified)", "%.04f, %.04f, %.04f. %.04f",
                     pidRUNTOPOSITION.p, pidRUNTOPOSITION.i, pidRUNTOPOSITION.d, pidRUNTOPOSITION.f);
 
+                telemetry.addData("current stage number", STAGE);
                 telemetry.addData("capstone", robot.capstone.getPosition());
                 telemetry.addData("left servo", robot.servoLeft.getPosition());
                 telemetry.addData("right servo", robot.servoRight.getPosition());

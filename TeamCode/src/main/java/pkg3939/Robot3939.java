@@ -54,10 +54,9 @@ public class Robot3939 {
     }
 
     public void initLinearSlides(HardwareMap hwmap) {
-        //slides = hwmap.dcMotor.get("slides");
         slides = (DcMotorEx)hwmap.dcMotor.get("slides");
 
-        slides.setDirection(DcMotorSimple.Direction.FORWARD);
+        slides.setDirection(DcMotorSimple.Direction.REVERSE);
 
         slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -346,11 +345,11 @@ public class Robot3939 {
     }
 
     public void hingeWork() {
-        hinge.setPosition(0.72);
+        hinge.setPosition(0.7);
     }
 
     public void hingeHome() {
-        hinge.setPosition(0.06);
+        hinge.setPosition(0.04);
     }
 
     public void hingeSide() {
